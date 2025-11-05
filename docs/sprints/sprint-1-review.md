@@ -24,7 +24,7 @@ ideas into full blown meals.
 1. User navigates to site, clicks the create account button, creates 
 a user profile with demographic information (Age, Cooking Level, 
 Allergies, etc.) 
-2. Given no account: 
+2. Given no account:  
 	a. User visits website --> given a simple search interface --> The 
 user searches for a recipe and is presented with a list view of recipes 
 options with a simple image of the recipe and a name aggregated from 
@@ -100,8 +100,7 @@ blogs; unstructured mess
 | **Acquisition** | **Activation** | **Retention** |
 |------------------|----------------|----------------|
 | Site Visits | Accounts Created | Repeat Visitor |
-| Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) | 1st Recipe 
-Accessed After Account Creation Rate | Recipes Saves/Opened |
+| Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) | 1st Recipe Accessed After Account Creation Rate | Recipes Saves/Opened |
 |  |  | Average Session Length |
 |  |  | Recipe Searches |
 |  |  | Average Time Spent on Search Page |
