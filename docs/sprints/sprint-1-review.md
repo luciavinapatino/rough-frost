@@ -1,13 +1,13 @@
 # Sprint 1 Summary 
 ## Executive Summary 
-Our team is building a recipe aggregation webpage that allows users to 
+	Our team is building a recipe aggregation webpage that allows users to 
 create curated lists of recipes searched from their favorite sources. 
 Users will be able to form personalized accounts that have options for 
 further curation, recipe consolidations, filtered searches, and 
 easy-to-read and access recipes. In later stages, this could be a more 
 community-driven recipe sharing and consolidation tool to access recipes 
 and try new cuisine.  
-When we think of the journey from deciding what to cook to the process of 
+	When we think of the journey from deciding what to cook to the process of 
 choosing a recipe, there are many obstacles that can make this process 
 time-consuming and inefficient. First, a user could be dealing with a 
 multitude of options on Google where they must comb through where there 
@@ -50,48 +50,49 @@ be saved in standalone Recipes or in the Lists tab
  
 ### User Personas 
 #### Persona 1 — The Busy Pragmatist Cook 
-Name: Maya, 31  
-Life Context: Works full-time in consulting, lives with partner, cooks 
+**Name**: Maya, 31  
+**Life Context**: Works full-time in consulting, lives with partner, cooks 
 dinner 3–4 nights per week  
-Pain Today: Hates scrolling through “my mother-in-law’s Tuscan summer 
+**Pain Today**: Hates scrolling through “my mother-in-law’s Tuscan summer 
 memories…” blog posts just to get to ingredients  
-Primary Goals:   
+**Primary Goals**:   
 - Quick search → clean, concise recipe → cook immediately 
 - Wants to save go-to recipes in one place instead of bookmarking 
 random URLs 
 - Wants to annotate (e.g. “less chili for Ben”) 
-Value of Product to Her: 
+**Value of Product to Her**: 
 - Time savings + mental clarity 
 - One library across blogs without all the fluff 
 - Notes as personal memory over time 
  
 #### Persona 2 — The New Home Cook in Learning Mode 
-Name: Jordan, 24   
-Life Context: Just graduated, first apartment, learning to cook  
-Pain Today: Gets overwhelmed by choice and recipe tone; too much  
+**Name**: Jordan, 24   
+**Life Context**: Just graduated, first apartment, learning to cook  
+**Pain Today**: Gets overwhelmed by choice and recipe tone; too much  
 storytelling and pop-ups, hard to know what’s “standard format”  
-Primary Goals:  
+**Primary Goals**:  
 - Clear, standardized instructions 
 - Save beginner-friendly dishes and make slight tweaks as skills 
 grow 
 - Wants to search through a curated list of trusted blogs, not the 
 whole internet 
-Value of Product to Them:   
+**Value of Product to Them**:   
 - Feels “guided” without gatekeeping 
 - Library gives them confidence + trackable progress 
 - Notes and re-searchability help build routine 
  
 #### Persona 3 — The Hobby Food Nerd / Tinkerer 
-Name: Celeste, 38  
-Life Context: Loves cooking, sends recipes to friends, hosts dinner 
+**Name**: Celeste, 38  
+**Life Context**: Loves cooking, sends recipes to friends, hosts dinner 
 parties  
-Pain Today: Has 200 screenshots + Notes app chaos + random saved TikToks / 
+**Pain Today**: Has 200 screenshots + Notes app chaos + random saved 
+TikToks / 
 blogs; unstructured mess   
-Primary Goals:  
+**Primary Goals**:  
 - Aggregate from chosen sources 
 - Store and categorize her edits (“my version”) 
 - Eventually share best recipes with friends or online 
-Value of Product to Her:   
+**Value of Product to Her**:   
 - Finally gives structure to hobby 
 - Allows sharing and personalization 
 - Becomes a culinary archive of “her takes” 
@@ -100,10 +101,10 @@ Value of Product to Her:
 |------------------|----------------|----------------|
 | Site Visits | Accounts Created | Repeat Visitor |
 | Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) | 1st Recipe 
-Accessed After Account Creation Rate | Recipes Saved/Opened |
-| Average Session Length |  |  |
-| Recipe Searches |  |  |
-| Average Time Spent on Search Page |  |  | 
+Accessed After Account Creation Rate | Recipes Saves/Opened |
+|  |  | Average Session Length |
+|  |  | Recipe Searches |
+|  |  | Average Time Spent on Search Page |
  
 ### Key Features 
 #### Core Features (For MVP) 
