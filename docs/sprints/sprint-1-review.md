@@ -21,41 +21,41 @@ ideas into full blown meals.
 
 ## User Research & Problem Definition 
 ### User Journeys (All Users) 
-1.User navigates to site, clicks the create account button, creates 
+1. User navigates to site, clicks the create account button, creates 
 a user profile with demographic information (Age, Cooking Level, 
 Allergies, etc.) 
-2.Given no account: 
-	a.User visits website --> given a simple search interface --> The 
+2. Given no account: 
+	a. User visits website --> given a simple search interface --> The 
 user searches for a recipe and is presented with a list view of recipes 
 options with a simple image of the recipe and a name aggregated from 
 various food blogs.  
-3.User can input blogs or sites with specific names to prime the 
+3. User can input blogs or sites with specific names to prime the 
 search functionality to only return options from those sources to create 
 more specific and curated options that are not as cumbersome to look 
 through 
-4.Users click into the search button, have searched return, and can 
+4. Users click into the search button, have searched return, and can 
 filter the options based on criteria (Time to make, ingredients available, 
 cuisine type) 
-5.When a user finally finds a recipe in the list view they find 
+5. When a user finally finds a recipe in the list view they find 
 appealing, they are brought to a recipe detail page with image, 
 ingredients, and instructions 
-6.User can click into a recipe and is presented with a ingredient 
+6. User can click into a recipe and is presented with a ingredient 
 list and recipe instructions (rather than the standard long blog post 
 telling you about the author etc).   
-7.Users with accounts save a recipe to their own page, which is then 
+7. Users with accounts save a recipe to their own page, which is then 
 searchable by them and can have notes added to it by the user (e.g. “I 
 prefer to replace the cilantro with parsley in this recipe”.) 
-8.Users find a new recipe and create a manual recipe entry. This can 
+8. Users find a new recipe and create a manual recipe entry. This can 
 be saved in standalone Recipes or in the Lists tab 
  
 ### User Personas 
 #### Persona 1 — The Busy Pragmatist Cook 
-Name: Maya, 31 
+Name: Maya, 31  
 Life Context: Works full-time in consulting, lives with partner, cooks 
-dinner 3–4 nights per week 
+dinner 3–4 nights per week  
 Pain Today: Hates scrolling through “my mother-in-law’s Tuscan summer 
-memories…” blog posts just to get to ingredients 
-Primary Goals: 
+memories…” blog posts just to get to ingredients  
+Primary Goals:   
 - Quick search → clean, concise recipe → cook immediately 
 - Wants to save go-to recipes in one place instead of bookmarking 
 random URLs 
@@ -66,43 +66,44 @@ Value of Product to Her:
 - Notes as personal memory over time 
  
 #### Persona 2 — The New Home Cook in Learning Mode 
-Name: Jordan, 24 
-Life Context: Just graduated, first apartment, learning to cook 
-Pain Today: Gets overwhelmed by choice and recipe tone; too much 
-storytelling and pop-ups, hard to know what’s “standard format” 
-Primary Goals: 
+Name: Jordan, 24   
+Life Context: Just graduated, first apartment, learning to cook  
+Pain Today: Gets overwhelmed by choice and recipe tone; too much  
+storytelling and pop-ups, hard to know what’s “standard format”  
+Primary Goals:  
 - Clear, standardized instructions 
 - Save beginner-friendly dishes and make slight tweaks as skills 
 grow 
 - Wants to search through a curated list of trusted blogs, not the 
 whole internet 
-Value of Product to Them: 
+Value of Product to Them:   
 - Feels “guided” without gatekeeping 
 - Library gives them confidence + trackable progress 
 - Notes and re-searchability help build routine 
  
 #### Persona 3 — The Hobby Food Nerd / Tinkerer 
-Name: Celeste, 38 
+Name: Celeste, 38  
 Life Context: Loves cooking, sends recipes to friends, hosts dinner 
-parties 
+parties  
 Pain Today: Has 200 screenshots + Notes app chaos + random saved TikToks / 
-blogs; unstructured mess 
-Primary Goals: 
+blogs; unstructured mess   
+Primary Goals:  
 - Aggregate from chosen sources 
 - Store and categorize her edits (“my version”) 
 - Eventually share best recipes with friends or online 
-Value of Product to Her: 
+Value of Product to Her:   
 - Finally gives structure to hobby 
 - Allows sharing and personalization 
 - Becomes a culinary archive of “her takes” 
-### Succes Metrics 
-Acquisition 	Activation 	Retention 
-Site Visits 	Accounts Created 	Repeat Visitor 
-Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) 	1st Recipe 
-Accessed After Account Creation Rate 	Recipes Saves/Opened 
- 	 	Average Sessions Length 
- 	 	Recipe Searches 
- 	 	Average Time Spent on Search Page 
+### Succes Metrics   
+| **Acquisition** | **Activation** | **Retention** |
+|------------------|----------------|----------------|
+| Site Visits | Accounts Created | Repeat Visitor |
+| Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) | 1st Recipe 
+Accessed After Account Creation Rate | Recipes Saved/Opened |
+| Average Session Length |  |  |
+| Recipe Searches |  |  |
+| Average Time Spent on Search Page |  |  | 
  
 ### Key Features 
 #### Core Features (For MVP) 
@@ -197,14 +198,11 @@ Link to project:
 https://github.com/users/luciavinapatino/projects/1/views/1
 
 ## Sprint Planning for Sprint 2 & 3 
-Link to Sprint Board: https://github.com/users/luciavinapatino/projects/1 
+Link to Sprint Board: https://github.com/users/luciavinapatino/projects/1  
 Link to Sprint 2 Planning Doc: 
 https://github.com/luciavinapatino/rough-frost/blob/main/docs/sprints/sprint-2-planning.md 
 
 ## Team Documentation 
 Link to Team Charter, Definition of Done, and Definition of Ready: 
 https://github.com/luciavinapatino/rough-frost/tree/main/docs 
- 
- 
-
 
