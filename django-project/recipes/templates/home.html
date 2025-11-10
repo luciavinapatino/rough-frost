@@ -18,8 +18,34 @@
     </style>
 </head>
 <body>
-    <h1>Hello, Recipe App!</h1>
-    <p>Your Django + PostgreSQL webapp is working!</p>
+    <h1>Recipes</h1>
+
+    <p>
+        <a href="{% url 'create_recipe' %}">Create a new recipe</a>
+    </p>
+
+    <form method="get" action="." style="margin-bottom:20px;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search recipes..." style="width:60%; padding:8px;" />
+        <button type="submit" style="padding:8px 12px;">Search</button>
+        {% if query %}
+            <a href="{% url 'home' %}" style="margin-left:10px;">clear</a>
+        {% endif %}
+    </form>
+
+    {% if recipes and recipes.exists %}
+        <ul style="text-align:left;">
+            {% for r in recipes %}
+                <li>
+                    <strong><a href="{% url 'recipe_detail' r.pk %}">{{ r.title }}</a></strong> — {{ r.description|truncatechars:150 }}
+                    {% if r.tags.all %}
+                        <div style="font-size:0.9em; color:#666;">Tags: {% for t in r.tags.all %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No recipes found. Try creating one.</p>
+    {% endif %}
 </body>
 </html>
 

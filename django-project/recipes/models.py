@@ -1,3 +1,18 @@
+"""
+Database models for the recipes application.
+
+This module defines the core data models:
+    - Recipe: Main recipe entity with title, description, author, and image
+    - Tag: Labels for categorizing recipes (vegan, dessert, gluten-free, etc.)
+    - Step: Numbered cooking instructions for recipes
+    - Favorite: User favorites with personal notes about recipes
+
+Relationships:
+    - Recipe has one author (ForeignKey to User)
+    - Recipe can have many tags (ManyToMany)
+    - Recipe can have many steps (ForeignKey from Step)
+    - Recipe can be favorited by many users (ForeignKey from Favorite)
+"""
 from django.db import models
 from django.contrib.auth.models import User
 

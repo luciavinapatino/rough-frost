@@ -1,5 +1,18 @@
 """
 Django settings for recipeapp project.
+
+This module contains all Django configuration for the recipes project,
+including database, middleware, installed apps, and more.
+
+The configuration supports multiple database backends:
+1. SQLite (default for local development)
+2. PostgreSQL (for production and advanced features)
+
+Database selection is determined by environment variables:
+- If DATABASE_URL is set (Render, Heroku), it takes precedence
+- Otherwise, DB_ENGINE determines the backend:
+  - 'sqlite' (default) uses SQLite
+  - 'postgresql' uses PostgreSQL
 """
 
 from pathlib import Path
@@ -14,11 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# Generate a new key for production using: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
+# In production, set ALLOWED_HOSTS to your domain name(s)
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
@@ -67,30 +82,55 @@ WSGI_APPLICATION = 'recipeapp.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+#
+# Database configuration priority (highest to lowest):
+# 1. DATABASE_URL environment variable (used by Render, Heroku, etc.)
+# 2. DB_ENGINE with individual DB_* variables (PostgreSQL/SQLite)
+# 3. Default to SQLite for local development
+#
+# DATABASE_URL format examples:
+#   - postgres://user:password@localhost:5432/dbname
+#   - sqlite:///path/to/db.sqlite3
+#
+# To use PostgreSQL locally, set in .env:
+#   DB_ENGINE=postgresql
+#   DB_NAME=recipeapp_db
+#   DB_USER=postgres
+#   DB_PASSWORD=postgres
+#   DB_HOST=localhost
+#   DB_PORT=5432
+import dj_database_url
 
-# Use SQLite for local development if DB_ENGINE is not set or set to 'sqlite'
-# Set DB_ENGINE=postgresql in .env to use PostgreSQL
-DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
-
-if DB_ENGINE == 'postgresql':
+# First, support a single DATABASE_URL environment variable (used by Render, Heroku, etc.)
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    # Parse the DATABASE_URL into Django's DATABASES setting
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'recipeapp_db'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-        }
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
 else:
-    # SQLite for easy local development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+    # Fallback to per-variable DB config. Use SQLite by default for local development.
+    DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
+
+    if DB_ENGINE == 'postgresql':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.getenv('DB_NAME', 'recipeapp_db'),
+                'USER': os.getenv('DB_USER', 'postgres'),
+                'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+                'HOST': os.getenv('DB_HOST', 'localhost'),
+                'PORT': os.getenv('DB_PORT', '5432'),
+            }
         }
-    }
+    else:
+        # SQLite for easy local development
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 
 # Password validation
