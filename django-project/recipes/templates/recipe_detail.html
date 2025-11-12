@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe.title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .meta { color: #666; font-size: 0.9em; margin-bottom: 12px }
+        .tags { margin-top: 8px; font-size: 0.9em; color: #555 }
+        .steps { margin-top: 18px; text-align: left }
+        img.preview { max-width:100%; height:auto; margin-top:12px; }
+    </style>
+</head>
+<body>
+    <a href="{% url 'home' %}">← Back to recipes</a>
+    <h1>{{ recipe.title }}</h1>
+    <div class="meta">By {{ recipe.author.username }} — {{ recipe.created_at }}</div>
+
+    {% if recipe.image_url %}
+        <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="preview" />
+    {% endif %}
+
+    <div class="description">{{ recipe.description|linebreaks }}</div>
+
+    {% if tags %}
+        <div class="tags">Tags: {% for t in tags %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
+    {% endif %}
+
+    {% if steps %}
+        <div class="steps">
+            <h3>Steps</h3>
+            <ol>
+                {% for s in steps %}
+                    <li>{{ s.instruction_text|linebreaks }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    {% endif %}
+
+</body>
+</html>
