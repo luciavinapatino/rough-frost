@@ -1,81 +1,53 @@
-"""
-Forms for recipe creation and management.
-
-This module provides form classes for creating and editing recipes,
-including handling of tags (comma-separated) and steps (newline-separated).
-"""
 from django import forms
-from django.contrib.auth.models import User
-
-from .models import Recipe, Tag
+from .models import Recipe, Ingredient, Step
 
 
 class RecipeForm(forms.ModelForm):
-    """
-    Form for creating and editing recipes.
+    """Form for creating and editing recipes."""
     
-    This form extends Django's ModelForm for the Recipe model and adds two additional
-    custom fields for user convenience:
-    - tags_csv: Allows users to input tags as comma-separated values instead of 
-      selecting from a multi-select dropdown
-    - steps_text: Allows users to input cooking steps as newline-separated text 
-      instead of creating individual Step objects
-    
-    The form handles parsing of comma-separated tags and newline-separated steps,
-    which are then converted to actual database objects by the view.
-    """
-    
-    tags_csv = forms.CharField(
-        required=False,
-        label='Tags (comma-separated)',
-        widget=forms.TextInput(attrs={'placeholder': 'vegan, dessert, quick-meal'}),
-        help_text='Enter tags separated by commas. Tags will be created if they don\'t exist.'
-    )
-    
-    steps_text = forms.CharField(
-        required=False,
-        label='Steps (one per line)',
-        widget=forms.Textarea(attrs={'rows': 6, 'placeholder': '1. Preheat oven\n2. Mix ingredients\n3. Bake'}),
-        help_text='Enter each cooking step on a new line. Steps will be numbered automatically.'
-    )
-
     class Meta:
         model = Recipe
-        fields = ['title', 'description', 'image_url']
-        help_texts = {
-            'title': 'The name of your recipe',
-            'description': 'A brief description of what this recipe is',
-            'image_url': 'Optional: URL to an image of the finished dish',
+        fields = ['title', 'description', 'image', 'image_url']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Recipe name'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Brief description of the recipe'}),
+            'image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'image_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Or enter image URL (optional)'}),
+        }
+        labels = {
+            'title': 'Recipe Title',
+            'description': 'Description',
+            'image': 'Upload Image (optional)',
+            'image_url': 'Or Image URL (optional)',
         }
 
-    def clean_tags_csv(self):
-        """
-        Validate and parse comma-separated tag input.
-        
-        Strips whitespace from each tag and filters out empty strings.
-        Converts the comma-separated string into a list of individual tag names.
-        
-        Returns:
-            list: Cleaned list of tag name strings
-        """
-        data = self.cleaned_data.get('tags_csv', '')
-        # Normalize: split by comma, strip whitespace, filter empty strings
-        tag_names = [t.strip() for t in data.split(',') if t.strip()]
-        return tag_names
+
+class IngredientForm(forms.ModelForm):
+    """Form for a single ingredient."""
     
-    def clean_title(self):
-        """
-        Validate recipe title field.
-        
-        Ensures the title is not empty after stripping whitespace.
-        
-        Returns:
-            str: Cleaned title
-            
-        Raises:
-            ValidationError: If title is empty or only whitespace
-        """
-        title = self.cleaned_data.get('title', '').strip()
-        if not title:
-            raise forms.ValidationError('Recipe title cannot be empty.')
-        return title
+    class Meta:
+        model = Ingredient
+        fields = ['name', 'amount']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingredient name'}),
+            'amount': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Amount (e.g., 2 cups)'}),
+        }
+        labels = {
+            'name': 'Ingredient',
+            'amount': 'Amount',
+        }
+
+
+class StepForm(forms.ModelForm):
+    """Form for a single instruction step."""
+    
+    class Meta:
+        model = Step
+        fields = ['instruction_text']
+        widgets = {
+            'instruction_text': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter instruction...'}),
+        }
+        labels = {
+            'instruction_text': 'Instruction',
+        }
+

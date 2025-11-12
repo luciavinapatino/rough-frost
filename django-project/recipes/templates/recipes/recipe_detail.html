@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        color: #333;
+      }
+      .meta {
+        text-align: center;
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      .image-container {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .image-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .description {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 4px;
+        line-height: 1.6;
+      }
+      h2 {
+        color: #333;
+        border-bottom: 2px solid #4CAF50;
+        padding-bottom: 5px;
+        margin-top: 30px;
+      }
+      .ingredients-list,
+      .instructions-list {
+        margin: 20px 0;
+      }
+      .ingredient-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .instruction-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: #f9f9f9;
+        border-left: 4px solid #4CAF50;
+        border-radius: 4px;
+      }
+      .step-number {
+        font-weight: bold;
+        color: #4CAF50;
+        margin-right: 10px;
+      }
+      a {
+        color: #2196F3;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 20px;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .back-link {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{ recipe.title }}</h1>
+      <div class="meta">
+        Created by {{ recipe.author.username }} on {{ recipe.created_at|date:"F d, Y" }}
+      </div>
+      
+      {% if recipe.image %}
+        <div class="image-container">
+          <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+        </div>
+      {% elif recipe.image_url %}
+        <div class="image-container">
+          <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}">
+        </div>
+      {% endif %}
+      
+      {% if recipe.description %}
+        <div class="description">
+          {{ recipe.description }}
+        </div>
+      {% endif %}
+      
+      {% if ingredients %}
+        <h2>Ingredients</h2>
+        <div class="ingredients-list">
+          {% for ingredient in ingredients %}
+            <div class="ingredient-item">
+              {% if ingredient.amount %}
+                <strong>{{ ingredient.amount }}</strong> {{ ingredient.name }}
+              {% else %}
+                {{ ingredient.name }}
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      {% if steps %}
+        <h2>Instructions</h2>
+        <div class="instructions-list">
+          {% for step in steps %}
+            <div class="instruction-item">
+              <span class="step-number">Step {{ step.step_number }}:</span>
+              {{ step.instruction_text }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <div class="back-link">
+        <a href="{% url 'home' %}">← Back to Home</a>
+        {% if request.user.is_authenticated %}
+          | <a href="{% url 'my_recipes' %}">My Recipes</a>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+</html>
+
