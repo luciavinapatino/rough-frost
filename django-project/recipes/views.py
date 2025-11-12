@@ -9,8 +9,118 @@ from .models import Recipe, Ingredient, Step
 from .forms import RecipeForm
 
 def home(request):
-    """Simple home page view."""
-    return render(request, 'home.html')
+    """
+    Home page displaying recipes with optional search functionality.
+    
+    Supports search via the 'q' GET parameter. Uses PostgreSQL full-text search
+    for better relevance when available, otherwise falls back to case-insensitive
+    substring matching.
+    
+    Context:
+        recipes: QuerySet of Recipe objects matching the search query (if provided)
+        query: The search query string (empty if no search performed)
+    """
+    query = request.GET.get('q', '').strip()
+    recipes = Recipe.objects.all()
+    
+    if query:
+        recipes = _search_recipes(query, recipes)
+
+    context = {
+        'recipes': recipes,
+        'query': query,
+    }
+    return render(request, 'home.html', context)
+
+
+def create_recipe(request):
+    """
+    Create a new recipe via form submission.
+    
+    Accepts POST requests with recipe title, description, optional image URL,
+    comma-separated tags, and newline-separated cooking steps.
+    
+    Automatically assigns the current logged-in user as the author. If no user
+    is logged in, assigns the recipe to the first user in the database.
+    
+    On successful creation, displays a success message and redirects to home.
+    
+    Query Parameters:
+        None (form data in POST body)
+    
+    Context (GET):
+        form: Empty RecipeForm instance
+    
+    Returns:
+        GET: Rendered create_recipe.html template
+        POST (valid): Redirect to home with success message
+        POST (invalid): Rendered create_recipe.html with form errors
+    """
+    if request.method == 'POST':
+        form = RecipeForm(request.POST)
+        if form.is_valid():
+            # Assign author: prefer logged-in user, otherwise first user in DB
+            author = request.user if request.user.is_authenticated else User.objects.first()
+            recipe = form.save(commit=False)
+            recipe.author = author
+            recipe.save()
+
+            # Tags: create or attach
+            tag_names = form.cleaned_data.get('tags_csv', [])
+            for name in tag_names:
+                tag_obj, _ = Tag.objects.get_or_create(name=name)
+                recipe.tags.add(tag_obj)
+
+            # Steps: newline separated
+            steps_text = form.cleaned_data.get('steps_text', '')
+            for idx, line in enumerate([s.strip() for s in steps_text.splitlines() if s.strip()], start=1):
+                Step.objects.create(recipe=recipe, step_number=idx, instruction_text=line)
+
+            messages.success(request, 'Recipe created successfully.')
+            return redirect('home')
+    else:
+        form = RecipeForm()
+
+    return render(request, 'create_recipe.html', {'form': form})
+
+
+def recipe_detail(request, pk):
+    """
+    Display a single recipe with all details: title, description, author, tags, and steps.
+    
+    Uses select_related and prefetch_related for efficient database queries.
+    Raises Http404 if the recipe with the given pk is not found.
+    
+    URL Parameters:
+        pk (int): Primary key of the recipe to display
+    
+    Context:
+        recipe: The Recipe object
+        steps: Ordered QuerySet of Step objects for this recipe
+        tags: QuerySet of Tag objects associated with this recipe
+    
+    Returns:
+        Rendered recipe_detail.html template, or Http404 if recipe not found
+    """
+    recipe = (
+        Recipe.objects.select_related('author')
+        .prefetch_related('tags', 'steps')
+        .filter(pk=pk)
+        .first()
+    )
+    if not recipe:
+        # Let Django render a normal 404
+        from django.http import Http404
+
+        raise Http404("Recipe not found")
+
+    context = {
+        'recipe': recipe,
+        'steps': recipe.steps.all(),
+        'tags': recipe.tags.all(),
+    }
+    return render(request, 'recipe_detail.html', context)
+
 
 class LoginView(View):
     template_name = "registration/login.html"
