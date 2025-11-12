@@ -21,10 +21,16 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         help_text="The user who created this recipe"
     )
+    image = models.ImageField(
+        upload_to='recipe_images/',
+        blank=True,
+        null=True,
+        help_text="Image of the finished recipe (optional)"
+    )
     image_url = models.URLField(
         blank=True,
         null=True,
-        help_text="URL to an image of the finished recipe (optional)"
+        help_text="URL to an image of the finished recipe (optional, alternative to image upload)"
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -125,3 +131,34 @@ class Favorite(models.Model):
     
     def __str__(self):
         return f"{self.user.username} favorited {self.recipe.title}"
+
+
+class Ingredient(models.Model):
+    """
+    Ingredient model - ingredients for recipes.
+    
+    Each recipe can have multiple ingredients. Each ingredient has a name and optional amount/unit.
+    """
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='ingredients',
+        help_text="The recipe this ingredient belongs to"
+    )
+    name = models.CharField(
+        max_length=200,
+        help_text="The name of the ingredient (e.g., 'Flour', 'Sugar', 'Eggs')"
+    )
+    amount = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="The amount needed (e.g., '2 cups', '1/2 teaspoon', '3')"
+    )
+    
+    class Meta:
+        ordering = ['name']  # Alphabetical order
+    
+    def __str__(self):
+        if self.amount:
+            return f"{self.amount} {self.name}"
+        return self.name

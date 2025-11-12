@@ -1,25 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe App</title>
+<html>
+  <head>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      p {
+        text-align: center;
+        margin: 10px 0;
+      }
+      form {
+        text-align: center;
+        margin: 10px 0;
+      }
+      a {
+        margin: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
     </style>
-</head>
-<body>
-    <h1>Hello, Recipe App!</h1>
-    <p>Your Django + PostgreSQL webapp is working!</p>
-</body>
+  </head>
+  <body>
+    <h1>Recipe App</h1>
+    {% if request.user.is_authenticated %}
+      <p>Welcome, {{ request.user.username }}!</p>
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="{% url 'create_recipe' %}"><button type="button" style="background: #4CAF50; color: white; border: none;">Create Recipe</button></a>
+        <a href="{% url 'my_recipes' %}"><button type="button" style="background: #2196F3; color: white; border: none;">My Recipes</button></a>
+      </div>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Log out</button>
+      </form>
+    {% else %}
+      <div style="text-align: center;">
+        <a href="{% url 'login' %}"><button type="button">Log in</button></a>
+        <a href="{% url 'register' %}"><button type="button">Create account</button></a>
+      </div>
+    {% endif %}
+  </body>
 </html>
-
