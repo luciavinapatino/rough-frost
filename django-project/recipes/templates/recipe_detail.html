@@ -1,42 +1,133 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ recipe.title }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        .meta { color: #666; font-size: 0.9em; margin-bottom: 12px }
-        .tags { margin-top: 8px; font-size: 0.9em; color: #555 }
-        .steps { margin-top: 18px; text-align: left }
-        img.preview { max-width:100%; height:auto; margin-top:12px; }
-    </style>
+    <title>{{ recipe.title }} - RecipeHub</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <a href="{% url 'home' %}">← Back to recipes</a>
-    <h1>{{ recipe.title }}</h1>
-    <div class="meta">By {{ recipe.author.username }} — {{ recipe.created_at }}</div>
+    <header class="main-header">
+        <div class="header-content">
+            <a href="{% url 'home' %}" class="logo">
+                <img src="{% static 'images/Logo_name.png' %}" alt="RecipeHub" style="height: 40px; width: auto;">
+            </a>
 
-    {% if recipe.image_url %}
-        <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="preview" />
-    {% endif %}
-
-    <div class="description">{{ recipe.description|linebreaks }}</div>
-
-    {% if tags %}
-        <div class="tags">Tags: {% for t in tags %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
-    {% endif %}
-
-    {% if steps %}
-        <div class="steps">
-            <h3>Steps</h3>
-            <ol>
-                {% for s in steps %}
-                    <li>{{ s.instruction_text|linebreaks }}</li>
-                {% endfor %}
-            </ol>
+            <nav class="main-nav">
+                <a href="{% url 'create_recipe' %}" class="nav-link">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 3V17M3 10H17" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Create Recipe
+                </a>
+                {% if user.is_authenticated %}
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="color: #666; font-size: 14px;">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none; font-size: 14px;">Logout</a>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn-primary" style="padding: 8px 20px; text-decoration: none; font-size: 14px;">Login</a>
+                {% endif %}
+            </nav>
         </div>
-    {% endif %}
+    </header>
 
+    <main class="main-content">
+        <div class="content-wrapper">
+            <a href="{% url 'home' %}" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M12 3L5 10L12 17" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Back to recipes
+            </a>
+
+            <div class="recipe-detail">
+                <div class="recipe-hero">
+                    {% if recipe.image_url %}
+                    <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="recipe-hero-image">
+                    {% else %}
+                    <img src="https://via.placeholder.com/800x400/FF6B35/FFFFFF?text={{ recipe.title|slice:':30' }}"
+                         alt="{{ recipe.title }}" class="recipe-hero-image">
+                    {% endif %}
+                </div>
+
+                <div class="recipe-header">
+                    <div class="recipe-title-section">
+                        <h1 class="recipe-title">{{ recipe.title }}</h1>
+                        {% if tags %}
+                            <span class="cuisine-tag">{{ tags.0.name }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="recipe-meta">
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 3C7 3 5 5 5 7C5 7 4 7 4 8C4 9 5 9 5 9V13C5 14.5 7 16 10 16C13 16 15 14.5 15 13V9C15 9 16 9 16 8C16 7 15 7 15 7C15 5 13 3 10 3Z" fill="currentColor"/>
+                            </svg>
+                            <span>{{ steps|length }} step{{ steps|length|pluralize }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M10 6V10H14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>By {{ recipe.author.username }}</span>
+                        </div>
+                        {% if tags|length > 1 %}
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M3 3L10 3L17 10L10 17L3 10Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            </svg>
+                            <span>{% for tag in tags %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="recipe-content">
+                    {% if recipe.description %}
+                    <section class="recipe-section">
+                        <h2>Description</h2>
+                        <p style="line-height: 1.8; color: #555;">{{ recipe.description }}</p>
+                    </section>
+                    {% endif %}
+
+                    {% if recipe.ingredients %}
+                    <section class="recipe-section">
+                        <h2>Ingredients</h2>
+                        <ul class="ingredients-list">
+                            {% for ingredient in recipe.ingredients.splitlines %}
+                                {% if ingredient.strip %}
+                                <li>{{ ingredient }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                    {% endif %}
+
+                    {% if steps %}
+                    <section class="recipe-section">
+                        <h2>Instructions</h2>
+                        <ol class="instructions-list">
+                            {% for step in steps %}
+                            <li>
+                                <span class="step-number">{{ step.step_number }}</span>
+                                <div class="step-content">
+                                    {{ step.instruction_text }}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </section>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>RecipeHub - Skip the stories, get straight to cooking. 🔍</p>
+    </footer>
 </body>
 </html>

@@ -1,51 +1,116 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-    </style>
+    <title>Discover Recipes - RecipeHub</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <h1>Recipes</h1>
+    <header class="main-header">
+        <div class="header-content">
+            <a href="{% url 'home' %}" class="logo">
+                <img src="{% static 'images/Logo_name.png' %}" alt="RecipeHub" style="height: 40px; width: auto;">
+            </a>
 
-    <p>
-        <a href="{% url 'create_recipe' %}">Create a new recipe</a>
-    </p>
+            <nav class="main-nav">
+                <a href="{% url 'create_recipe' %}" class="nav-link">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 3V17M3 10H17" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Create Recipe
+                </a>
+                {% if user.is_authenticated %}
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="color: #666; font-size: 14px;">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none; font-size: 14px;">Logout</a>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn-primary" style="padding: 8px 20px; text-decoration: none; font-size: 14px;">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
 
-    <form method="get" action="." style="margin-bottom:20px;">
-        <input type="text" name="q" value="{{ query }}" placeholder="Search recipes..." style="width:60%; padding:8px;" />
-        <button type="submit" style="padding:8px 12px;">Search</button>
-        {% if query %}
-            <a href="{% url 'home' %}" style="margin-left:10px;">clear</a>
-        {% endif %}
-    </form>
+    <main class="main-content">
+        <div class="content-wrapper">
+            <section class="hero-section">
+                <h1>Discover Recipes</h1>
+                <p>Search through our curated collection of recipes from trusted food blogs</p>
+            </section>
 
-    {% if recipes and recipes.exists %}
-        <ul style="text-align:left;">
-            {% for r in recipes %}
-                <li>
-                    <strong><a href="{% url 'recipe_detail' r.pk %}">{{ r.title }}</a></strong> — {{ r.description|truncatechars:150 }}
-                    {% if r.tags.all %}
-                        <div style="font-size:0.9em; color:#666;">Tags: {% for t in r.tags.all %}{{ t.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No recipes found. Try creating one.</p>
-    {% endif %}
+            <div class="search-section">
+                <form method="get" action="{% url 'home' %}">
+                    <div class="search-bar">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="8" cy="8" r="6" stroke="#999" stroke-width="2" fill="none"/>
+                            <path d="M12 12L17 17" stroke="#999" stroke-width="2"/>
+                        </svg>
+                        <input type="search" name="q" value="{{ query }}" placeholder="Search by recipe name, cuisine, ingredient, or source...">
+                    </div>
+                </form>
+
+                {% if query %}
+                <p class="results-count">
+                    Showing {{ recipes|length }} recipe{{ recipes|length|pluralize }} for "{{ query }}"
+                    <a href="{% url 'home' %}" style="margin-left: 10px; color: #FF6B35; text-decoration: none;">Clear search</a>
+                </p>
+                {% else %}
+                <p class="results-count">Showing all {{ recipes|length }} recipe{{ recipes|length|pluralize }}</p>
+                {% endif %}
+            </div>
+
+            <div class="recipes-grid">
+                {% if recipes %}
+                    {% for recipe in recipes %}
+                    <a href="{% url 'recipe_detail' recipe.pk %}" class="recipe-card">
+                        {% if recipe.image_url %}
+                        <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="recipe-card-image">
+                        {% else %}
+                        <img src="https://via.placeholder.com/400x300/FF6B35/FFFFFF?text={{ recipe.title|slice:':20' }}"
+                             alt="{{ recipe.title }}" class="recipe-card-image">
+                        {% endif %}
+
+                        <div class="recipe-card-content">
+                            <div class="recipe-card-header">
+                                <h3 class="recipe-card-title">{{ recipe.title }}</h3>
+                                {% if recipe.tags.all %}
+                                    <span class="cuisine-tag">{{ recipe.tags.first.name }}</span>
+                                {% endif %}
+                            </div>
+                            <p class="recipe-card-source">From {{ recipe.author.username }}</p>
+                            <div class="recipe-card-meta">
+                                <div class="meta-item">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                        <path d="M10 3C7 3 5 5 5 7C5 7 4 7 4 8C4 9 5 9 5 9V13C5 14.5 7 16 10 16C13 16 15 14.5 15 13V9C15 9 16 9 16 8C16 7 15 7 15 7C15 5 13 3 10 3Z" fill="currentColor"/>
+                                    </svg>
+                                    <span>{{ recipe.steps.count }} step{{ recipe.steps.count|pluralize }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <h2 style="color: #666; margin-bottom: 20px;">No recipes found</h2>
+                        <p style="color: #999; margin-bottom: 30px;">
+                            {% if query %}
+                                Try a different search term or
+                                <a href="{% url 'home' %}" style="color: #FF6B35;">browse all recipes</a>
+                            {% else %}
+                                Get started by creating your first recipe!
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'create_recipe' %}" class="btn-primary" style="display: inline-block; text-decoration: none;">Create Recipe</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>RecipeHub - Skip the stories, get straight to cooking. 🔍</p>
+    </footer>
 </body>
 </html>
-

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.db.models import Q
 from django.db import connection
 
@@ -201,5 +202,69 @@ def recipe_detail(request, pk):
         'tags': recipe.tags.all(),
     }
     return render(request, 'recipe_detail.html', context)
+
+
+def login_view(request):
+    """
+    Handle user login with username and password.
+
+    GET: Display login form
+    POST: Authenticate user and redirect to home on success
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_login(request, user)
+            messages.success(request, f'Welcome back, {user.username}!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Invalid username or password.')
+
+    return render(request, 'login.html', {'show_signup': False})
+
+
+def signup_view(request):
+    """
+    Handle user registration.
+
+    GET: Display signup form
+    POST: Create new user account and redirect to home on success
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        # Validate passwords match
+        if password1 != password2:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'login.html', {'show_signup': True})
+
+        # Check if username already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already taken.')
+            return render(request, 'login.html', {'show_signup': True})
+
+        # Create user
+        user = User.objects.create_user(username=username, email=email, password=password1)
+        auth_login(request, user)
+        messages.success(request, f'Welcome to RecipeHub, {user.username}!')
+        return redirect('home')
+
+    return render(request, 'login.html', {'show_signup': True})
+
+
+def logout_view(request):
+    """
+    Log out the current user and redirect to home page.
+    """
+    auth_logout(request)
+    messages.success(request, 'You have been logged out.')
+    return redirect('home')
 
 
