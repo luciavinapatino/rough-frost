@@ -100,92 +100,243 @@ def main():
     print(f'✓ Users: alice and bob')
 
     # Create tags
-    dessert, _ = Tag.objects.get_or_create(name='dessert')
-    breakfast, _ = Tag.objects.get_or_create(name='breakfast')
-    print(f'✓ Tags: dessert, breakfast')
+    italian, _ = Tag.objects.get_or_create(name='Italian')
+    indian, _ = Tag.objects.get_or_create(name='Indian')
+    american, _ = Tag.objects.get_or_create(name='American')
+    greek, _ = Tag.objects.get_or_create(name='Greek')
+    mexican, _ = Tag.objects.get_or_create(name='Mexican')
+    asian, _ = Tag.objects.get_or_create(name='Asian')
+    vegetarian, _ = Tag.objects.get_or_create(name='Vegetarian')
+    print(f'✓ Tags: Italian, Indian, American, Greek, Mexican, Asian, Vegetarian')
 
-    # Create recipes with tags
-    r1, created_r1 = Recipe.objects.get_or_create(
-        title='Simple Pancakes',
-        defaults={
-            'description': 'Fluffy pancakes made with basic ingredients.',
+    # Create 7 diverse recipes
+    recipes_data = [
+        {
+            'title': 'Classic Spaghetti Carbonara',
+            'description': 'Traditional Roman pasta dish with eggs, pecorino cheese, guanciale, and black pepper. Simple ingredients create a creamy, luxurious sauce without cream.',
             'author': alice,
-            'image_url': 'https://example.com/pancakes.jpg',
-            'created_at': timezone.now(),
-        }
-    )
-    # Ensure tags and author are set correctly (in case recipe already existed)
-    r1.author = alice
-    r1.image_url = 'https://example.com/pancakes.jpg'
-    r1.save()
-    r1.tags.add(breakfast)
-
-    r2, created_r2 = Recipe.objects.get_or_create(
-        title='Chocolate Chip Cookies',
-        defaults={
-            'description': 'Crispy edges, chewy center.',
+            'image_url': 'https://via.placeholder.com/400x300/FFD700/333333?text=Spaghetti+Carbonara',
+            'tags': [italian],
+            'ingredients': '''1 lb spaghetti
+6 oz pancetta or guanciale, diced
+4 large eggs
+1 cup freshly grated Parmesan cheese
+1 cup freshly grated Pecorino Romano cheese
+Freshly ground black pepper
+Salt for pasta water''',
+            'steps': [
+                'Bring a large pot of salted water to boil and cook spaghetti according to package directions until al dente.',
+                'While pasta cooks, heat a large skillet over medium heat. Add pancetta and cook until crispy, about 8-10 minutes.',
+                'In a bowl, whisk together eggs, Parmesan, Pecorino Romano, and plenty of black pepper.',
+                'Reserve 1 cup of pasta cooking water, then drain pasta.',
+                'Remove skillet from heat. Add hot pasta to the skillet with pancetta and toss to combine.',
+                'Quickly add egg mixture to pasta, tossing constantly. Add reserved pasta water a little at a time until sauce is creamy.',
+            ]
+        },
+        {
+            'title': 'Creamy Chicken Curry',
+            'description': 'Rich and aromatic Indian curry with tender chicken pieces in a tomato-based sauce with cream and warming spices like garam masala.',
             'author': bob,
-            'image_url': 'https://example.com/cookies.jpg',
-            'created_at': timezone.now(),
-        }
-    )
-    # Ensure tags and author are set correctly (in case recipe already existed)
-    r2.author = bob
-    r2.image_url = 'https://example.com/cookies.jpg'
-    r2.save()
-    r2.tags.add(dessert)
-    
-    print(f'✓ Recipes: Simple Pancakes (by alice), Chocolate Chip Cookies (by bob)')
+            'image_url': 'https://via.placeholder.com/400x300/FF8C00/333333?text=Chicken+Curry',
+            'tags': [indian],
+            'ingredients': '''2 lbs boneless chicken thighs, cut into pieces
+2 large onions, finely chopped
+3 tbsp ginger-garlic paste
+2 cups tomato puree
+1 cup coconut cream
+2 tsp turmeric powder
+2 tsp chili powder
+3 tsp garam masala
+3 tbsp cooking oil
+Fresh cilantro for garnish
+Salt to taste''',
+            'steps': [
+                'Heat oil in a large pan and sauté onions until golden brown.',
+                'Add ginger-garlic paste and cook for 2 minutes until fragrant.',
+                'Add tomato puree, turmeric, chili powder, and garam masala. Cook for 5 minutes.',
+                'Add chicken pieces and coat well with the sauce. Cook for 10 minutes.',
+                'Pour in coconut cream and simmer for 15 minutes until chicken is cooked through.',
+                'Garnish with fresh cilantro and serve with rice or naan.',
+            ]
+        },
+        {
+            'title': 'Perfect Chocolate Chip Cookies',
+            'description': 'The ultimate chocolate chip cookies with crispy edges and a soft, chewy center. Loaded with chocolate chips in every bite.',
+            'author': alice,
+            'image_url': 'https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Chocolate+Cookies',
+            'tags': [american],
+            'ingredients': '''2 1/4 cups all-purpose flour
+1 cup unsalted butter, softened
+3/4 cup granulated sugar
+3/4 cup brown sugar
+2 large eggs
+2 tsp vanilla extract
+1 tsp baking soda
+1 tsp salt
+2 cups chocolate chips''',
+            'steps': [
+                'Preheat oven to 350°F (175°C). Line baking sheets with parchment paper.',
+                'Cream together butter and both sugars until light and fluffy.',
+                'Beat in eggs one at a time, then add vanilla extract.',
+                'In a separate bowl, whisk together flour, baking soda, and salt.',
+                'Gradually mix dry ingredients into wet ingredients until just combined.',
+                'Fold in chocolate chips.',
+                'Drop rounded tablespoons of dough onto prepared baking sheets.',
+                'Bake for 10-12 minutes until edges are golden. Cool on baking sheet for 5 minutes.',
+            ]
+        },
+        {
+            'title': 'Fresh Greek Salad',
+            'description': 'Crisp vegetables, tangy feta cheese, and Kalamata olives dressed simply with olive oil and lemon juice.',
+            'author': bob,
+            'image_url': 'https://via.placeholder.com/400x300/32CD32/333333?text=Greek+Salad',
+            'tags': [greek, vegetarian],
+            'ingredients': '''4 large tomatoes, chopped
+2 cucumbers, sliced
+1 red onion, thinly sliced
+1 cup Kalamata olives
+8 oz feta cheese, crumbled
+1/4 cup olive oil
+2 tbsp lemon juice
+1 tsp dried oregano
+Salt and pepper to taste''',
+            'steps': [
+                'Chop tomatoes, cucumbers, and red onion into bite-sized pieces.',
+                'Add to a large bowl with Kalamata olives.',
+                'Whisk together olive oil, lemon juice, oregano, salt, and pepper.',
+                'Pour dressing over salad and toss gently.',
+                'Top with crumbled feta cheese and serve immediately.',
+            ]
+        },
+        {
+            'title': 'Street-Style Chicken Tacos',
+            'description': 'Authentic Mexican street tacos with marinated grilled chicken, fresh cilantro, onions, and a squeeze of lime on soft corn tortillas.',
+            'author': alice,
+            'image_url': 'https://via.placeholder.com/400x300/FF6347/FFFFFF?text=Chicken+Tacos',
+            'tags': [mexican],
+            'ingredients': '''2 lbs boneless chicken thighs
+12 small corn tortillas
+Juice of 3 limes
+4 garlic cloves, minced
+2 tsp cumin
+2 tsp chili powder
+1 tsp dried oregano
+1 white onion, diced
+1/2 cup fresh cilantro, chopped
+Lime wedges for serving
+Salt to taste''',
+            'steps': [
+                'Marinate chicken thighs in lime juice, garlic, cumin, chili powder, and oregano for at least 1 hour.',
+                'Heat a grill or cast iron skillet over high heat.',
+                'Grill chicken for 6-7 minutes per side until charred and cooked through.',
+                'Let chicken rest for 5 minutes, then chop into small pieces.',
+                'Warm corn tortillas on the grill.',
+                'Assemble tacos with chicken, diced onions, fresh cilantro, and lime wedges.',
+            ]
+        },
+        {
+            'title': 'Asian Beef Stir-Fry',
+            'description': 'Quick and flavorful stir-fry with tender beef strips, crisp vegetables, and a savory soy-ginger sauce served over rice.',
+            'author': bob,
+            'image_url': 'https://via.placeholder.com/400x300/8B0000/FFFFFF?text=Beef+Stir-Fry',
+            'tags': [asian],
+            'ingredients': '''1.5 lbs flank steak, thinly sliced
+1/4 cup soy sauce
+2 tbsp cornstarch
+1 tbsp sesame oil
+2 bell peppers, sliced
+2 cups broccoli florets
+1 cup snap peas
+3 garlic cloves, minced
+2 tbsp fresh ginger, minced
+2 tbsp honey
+3 tbsp vegetable oil
+Cooked rice for serving''',
+            'steps': [
+                'Slice beef thinly against the grain and marinate in soy sauce, cornstarch, and sesame oil.',
+                'Heat wok over high heat until smoking. Add oil.',
+                'Stir-fry beef in batches until browned, about 2 minutes per batch. Remove and set aside.',
+                'Add vegetables (bell peppers, broccoli, snap peas) and stir-fry for 3-4 minutes.',
+                'Return beef to wok. Add sauce mixture of soy sauce, ginger, garlic, and a touch of honey.',
+                'Toss everything together for 1-2 minutes until heated through and coated in sauce.',
+                'Serve immediately over steamed rice.',
+            ]
+        },
+        {
+            'title': 'Colorful Buddha Bowl',
+            'description': 'Nourishing vegetarian bowl packed with roasted vegetables, quinoa, chickpeas, and creamy tahini dressing.',
+            'author': alice,
+            'image_url': 'https://via.placeholder.com/400x300/9370DB/FFFFFF?text=Buddha+Bowl',
+            'tags': [vegetarian],
+            'ingredients': '''1 cup quinoa
+1 can (15 oz) chickpeas, drained
+1 large sweet potato, cubed
+2 cups broccoli florets
+2 cups cauliflower florets
+2 cups kale, chopped
+1/4 cup tahini
+2 tbsp lemon juice
+2 garlic cloves, minced
+3 tbsp olive oil
+2 tbsp sesame seeds
+Salt and pepper to taste''',
+            'steps': [
+                'Cook quinoa according to package directions and set aside.',
+                'Roast chickpeas and vegetables (sweet potato, broccoli, cauliflower) at 425°F for 25-30 minutes.',
+                'Prepare tahini dressing by whisking tahini, lemon juice, garlic, and water until smooth.',
+                'Massage kale with a bit of olive oil and lemon juice.',
+                'Assemble bowls with quinoa, roasted vegetables, chickpeas, and kale.',
+                'Drizzle with tahini dressing and garnish with sesame seeds.',
+            ]
+        },
+    ]
 
-    # Create steps for recipe 1
-    Step.objects.get_or_create(
-        recipe=r1,
-        step_number=1,
-        defaults={'instruction_text': 'Mix dry ingredients.'}
-    )
-    Step.objects.get_or_create(
-        recipe=r1,
-        step_number=2,
-        defaults={'instruction_text': 'Add milk and eggs, whisk to combine.'}
-    )
-    Step.objects.get_or_create(
-        recipe=r1,
-        step_number=3,
-        defaults={'instruction_text': 'Cook on a hot griddle until golden.'}
-    )
+    recipes = []
+    for recipe_data in recipes_data:
+        recipe, created = Recipe.objects.get_or_create(
+            title=recipe_data['title'],
+            defaults={
+                'description': recipe_data['description'],
+                'author': recipe_data['author'],
+                'image_url': recipe_data['image_url'],
+                'ingredients': recipe_data.get('ingredients', ''),
+                'created_at': timezone.now(),
+            }
+        )
+        recipe.author = recipe_data['author']
+        recipe.image_url = recipe_data['image_url']
+        recipe.description = recipe_data['description']
+        recipe.ingredients = recipe_data.get('ingredients', '')
+        recipe.save()
 
-    # Create steps for recipe 2
-    Step.objects.get_or_create(
-        recipe=r2,
-        step_number=1,
-        defaults={'instruction_text': 'Preheat oven to 350°F (175°C).'}
-    )
-    Step.objects.get_or_create(
-        recipe=r2,
-        step_number=2,
-        defaults={'instruction_text': 'Cream butter and sugars, add eggs and vanilla.'}
-    )
-    Step.objects.get_or_create(
-        recipe=r2,
-        step_number=3,
-        defaults={'instruction_text': 'Fold in chocolate chips and bake 10-12 minutes.'}
-    )
-    
-    print(f'✓ Steps: 6 steps created (3 per recipe)')
+        for tag in recipe_data['tags']:
+            recipe.tags.add(tag)
+
+        # Add steps
+        for idx, step_text in enumerate(recipe_data['steps'], start=1):
+            Step.objects.get_or_create(
+                recipe=recipe,
+                step_number=idx,
+                defaults={'instruction_text': step_text}
+            )
+
+        recipes.append(recipe)
+
+    print(f'✓ Recipes: Created/updated 7 recipes with steps')
 
     # Create favorites
-    Favorite.objects.get_or_create(
-        user=bob,
-        recipe=r1,
-        defaults={'notes': 'Family favorite'}
-    )
-    Favorite.objects.get_or_create(
-        user=alice,
-        recipe=r2,
-        defaults={'notes': 'Baked for a party'}
-    )
-    
-    print(f'✓ Favorites: bob favorited pancakes, alice favorited cookies')
+    if len(recipes) >= 2:
+        Favorite.objects.get_or_create(
+            user=bob,
+            recipe=recipes[0],  # Spaghetti Carbonara
+            defaults={'notes': 'Family favorite'}
+        )
+        Favorite.objects.get_or_create(
+            user=alice,
+            recipe=recipes[1],  # Chicken Curry
+            defaults={'notes': 'Perfect for dinner parties'}
+        )
+        print(f'✓ Favorites: Created sample favorites for users')
 
     # Print verification summary
     print('\n' + '='*60)
@@ -216,3 +367,7 @@ def main():
     print('\n' + '='*60)
     print('✓ Seeding complete!')
     print('='*60)
+
+
+if __name__ == '__main__':
+    main()

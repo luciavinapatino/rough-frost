@@ -50,7 +50,11 @@ class Recipe(models.Model):
         blank=True,
         help_text="Tags that categorize this recipe (e.g., vegan, dessert, gluten-free)"
     )
-    
+    ingredients = models.TextField(
+        blank=True,
+        help_text="Recipe ingredients, one per line"
+    )
+
     class Meta:
         ordering = ['-created_at']  # Newest recipes first
     
