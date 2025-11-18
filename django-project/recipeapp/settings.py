@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files efficiently
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve static files efficiently (needed for Render)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,16 +101,22 @@ WSGI_APPLICATION = 'recipeapp.wsgi.application'
 #   DB_PASSWORD=postgres
 #   DB_HOST=localhost
 #   DB_PORT=5432
-import dj_database_url
 
 # First, support a single DATABASE_URL environment variable (used by Render, Heroku, etc.)
+# Only use dj_database_url if it's installed (for production deployments)
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
-    # Parse the DATABASE_URL into Django's DATABASES setting
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-    }
-else:
+    try:
+        import dj_database_url
+        # Parse the DATABASE_URL into Django's DATABASES setting
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        }
+    except ImportError:
+        # Fall through to per-variable config if dj_database_url not installed
+        DATABASE_URL = None
+
+if not DATABASE_URL:
     # Fallback to per-variable DB config. Use SQLite by default for local development.
     DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
 
@@ -172,7 +178,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directory where collectstatic will gather all static files
 
-# WhiteNoise configuration for serving static files
+# WhiteNoise configuration for serving static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
