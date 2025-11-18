@@ -1,6 +1,6 @@
 services:
   # PostgreSQL Database
-  - type: postgresql
+  - type: postgres
     name: recipeapp-db
     databaseName: recipeapp_db
     user: recipeapp_user
