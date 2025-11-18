@@ -149,6 +149,11 @@ def home(request):
     # Remove duplicates (can occur when filtering by multiple tags)
     recipes = recipes.distinct()
 
+    # Add cuisine tag to each recipe for display
+    for recipe in recipes:
+        cuisine_tag = recipe.tags.filter(category='cuisine').first()
+        recipe.cuisine_tag = cuisine_tag.name if cuisine_tag else None
+
     # Check if filters are active and produced no results
     active_filter_count = (
         (1 if cuisine_filter else 0) +
@@ -178,21 +183,22 @@ def home(request):
 def create_recipe(request):
     """
     Create a new recipe via form submission.
-    
-    Accepts POST requests with recipe title, description, optional image URL,
-    comma-separated tags, and newline-separated cooking steps.
-    
-    Automatically assigns the current logged-in user as the author. If no user
-    is logged in, assigns the recipe to the first user in the database.
-    
+
+    Accepts POST requests with recipe title, description, recipe author (original creator),
+    source URL, image URL, ingredients, prep/cook times, comma-separated tags,
+    and newline-separated cooking steps.
+
+    Automatically assigns the current logged-in user as the uploader (author field).
+    If no user is logged in, assigns the recipe to the first user in the database.
+
     On successful creation, displays a success message and redirects to home.
-    
+
     Query Parameters:
         None (form data in POST body)
-    
+
     Context (GET):
         form: Empty RecipeForm instance
-    
+
     Returns:
         GET: Rendered create_recipe.html template
         POST (valid): Redirect to home with success message
@@ -207,7 +213,12 @@ def create_recipe(request):
             recipe.author = author
             recipe.save()
 
-            # Tags: create or attach
+            # Cuisine type: add if selected
+            cuisine_tag = form.cleaned_data.get('cuisine_type')
+            if cuisine_tag:
+                recipe.tags.add(cuisine_tag)
+
+            # Additional tags: create or attach
             tag_names = form.cleaned_data.get('tags_csv', [])
             for name in tag_names:
                 tag_obj, _ = Tag.objects.get_or_create(name=name)

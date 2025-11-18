@@ -163,12 +163,35 @@
                         <div class="recipe-card-content">
                             <div class="recipe-card-header">
                                 <h3 class="recipe-card-title">{{ recipe.title }}</h3>
-                                {% if recipe.tags.all %}
-                                    <span class="cuisine-tag">{{ recipe.tags.first.name }}</span>
+                                {% if recipe.cuisine_tag %}
+                                    <span class="cuisine-tag">{{ recipe.cuisine_tag }}</span>
                                 {% endif %}
                             </div>
-                            <p class="recipe-card-source">From {{ recipe.author.username }}</p>
+                            <p class="recipe-card-source">
+                                {% if recipe.recipe_author %}
+                                    By {{ recipe.recipe_author }}
+                                {% else %}
+                                    From {{ recipe.author.username }}
+                                {% endif %}
+                            </p>
                             <div class="recipe-card-meta">
+                                {% if recipe.prep_time or recipe.cook_time %}
+                                <div class="meta-item">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                        <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+                                        <path d="M10 6V10H14" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    <span>
+                                        {% if recipe.prep_time and recipe.cook_time %}
+                                            {{ recipe.prep_time|add:recipe.cook_time }} min
+                                        {% elif recipe.prep_time %}
+                                            {{ recipe.prep_time }} min
+                                        {% elif recipe.cook_time %}
+                                            {{ recipe.cook_time }} min
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                {% endif %}
                                 <div class="meta-item">
                                     <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                                         <path d="M10 3C7 3 5 5 5 7C5 7 4 7 4 8C4 9 5 9 5 9V13C5 14.5 7 16 10 16C13 16 15 14.5 15 13V9C15 9 16 9 16 8C16 7 15 7 15 7C15 5 13 3 10 3Z" fill="currentColor"/>
