@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe.title }} - RecipeHub</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a href="{% url 'home' %}" class="logo">
+                <img src="{% static 'images/Logo_name.png' %}" alt="RecipeHub" style="height: 40px; width: auto;">
+            </a>
+
+            <nav class="main-nav">
+                <a href="{% url 'create_recipe' %}" class="nav-link">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 3V17M3 10H17" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Create Recipe
+                </a>
+                {% if user.is_authenticated %}
+                <div class="user-info">
+                    <span class="username">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none;">Logout</a>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn-primary" style="padding: 8px 20px; text-decoration: none; font-size: 14px;">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="content-wrapper">
+            <a href="{% url 'home' %}" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M12 3L5 10L12 17" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Back to recipes
+            </a>
+
+            <div class="recipe-detail">
+                <div class="recipe-hero">
+                    {% if recipe.image_url %}
+                    <img src="{{ recipe.image_url }}" alt="{{ recipe.title }}" class="recipe-hero-image">
+                    {% else %}
+                    <img src="https://via.placeholder.com/800x400/FF6B35/FFFFFF?text={{ recipe.title|slice:':30' }}"
+                         alt="{{ recipe.title }}" class="recipe-hero-image">
+                    {% endif %}
+                </div>
+
+                <div class="recipe-header">
+                    <div class="recipe-title-section">
+                        <h1 class="recipe-title">{{ recipe.title }}</h1>
+
+                        <div class="tag-groups">
+                            {% if cuisine_tags %}
+                            <div class="tag-group">
+                                <span class="tag-label">Cuisine:</span>
+                                {% for tag in cuisine_tags %}
+                                <span class="cuisine-tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            {% if dietary_tags %}
+                            <div class="tag-group">
+                                <span class="tag-label">Dietary:</span>
+                                {% for tag in dietary_tags %}
+                                <span class="dietary-tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="recipe-meta">
+                        {% if recipe.recipe_author %}
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 2C6.69 2 4 4.69 4 8C4 11.31 6.69 14 10 14C13.31 14 16 11.31 16 8C16 4.69 13.31 2 10 2ZM10 5C11.1 5 12 5.9 12 7C12 8.1 11.1 9 10 9C8.9 9 8 8.1 8 7C8 5.9 8.9 5 10 5ZM10 12.2C8.5 12.2 7.29 11.16 6.9 9.98C6.95 8.65 9.6 7.9 10 7.9C10.4 7.9 13.05 8.65 13.1 9.98C12.71 11.16 11.5 12.2 10 12.2Z" fill="currentColor"/>
+                                <path d="M10 14C6.13 14 3 15.57 3 17.5V19H17V17.5C17 15.57 13.87 14 10 14Z" fill="currentColor"/>
+                            </svg>
+                            <span>By {{ recipe.recipe_author }}</span>
+                        </div>
+                        {% endif %}
+                        {% if recipe.source_url %}
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M9 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H15C16.1046 17 17 16.1046 17 15V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M11 3H17M17 3V9M17 3L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span><a href="{{ recipe.source_url }}" target="_blank" rel="noopener noreferrer" style="color: #FF6B35; text-decoration: none;">View Source</a></span>
+                        </div>
+                        {% endif %}
+                        {% if recipe.prep_time or recipe.cook_time %}
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M10 6V10H14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>
+                                {% if recipe.prep_time %}Prep: {{ recipe.prep_time }} min{% endif %}
+                                {% if recipe.prep_time and recipe.cook_time %} | {% endif %}
+                                {% if recipe.cook_time %}Cook: {{ recipe.cook_time }} min{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 3C7 3 5 5 5 7C5 7 4 7 4 8C4 9 5 9 5 9V13C5 14.5 7 16 10 16C13 16 15 14.5 15 13V9C15 9 16 9 16 8C16 7 15 7 15 7C15 5 13 3 10 3Z" fill="currentColor"/>
+                            </svg>
+                            <span>{{ steps|length }} step{{ steps|length|pluralize }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M3 8L10 3L17 8V15C17 16.1046 16.1046 17 15 17H5C3.89543 17 3 16.1046 3 15V8Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M9 17V11H11V17" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>Uploaded by {{ recipe.author.username }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recipe-content">
+                    {% if recipe.description %}
+                    <section class="recipe-section">
+                        <h2>Description</h2>
+                        <p style="line-height: 1.8; color: #555;">{{ recipe.description }}</p>
+                    </section>
+                    {% endif %}
+
+                    {% if recipe.ingredients %}
+                    <section class="recipe-section">
+                        <h2>Ingredients</h2>
+                        <ul class="ingredients-list">
+                            {% for ingredient in recipe.ingredients.splitlines %}
+                                {% if ingredient.strip %}
+                                <li>{{ ingredient }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                    {% endif %}
+
+                    {% if steps %}
+                    <section class="recipe-section">
+                        <h2>Instructions</h2>
+                        <ol class="instructions-list">
+                            {% for step in steps %}
+                            <li>
+                                <span class="step-number">{{ step.step_number }}</span>
+                                <div class="step-content">
+                                    {{ step.instruction_text }}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </section>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>RecipeHub - Skip the stories, get straight to cooking. 🔍</p>
+    </footer>
+</body>
+</html>

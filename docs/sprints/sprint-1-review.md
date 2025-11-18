@@ -1,13 +1,15 @@
 # Sprint 1 Summary 
 ## Executive Summary 
-	Our team is building a recipe aggregation webpage that allows users to 
+
+Our team is building a recipe aggregation webpage that allows users to 
 create curated lists of recipes searched from their favorite sources. 
 Users will be able to form personalized accounts that have options for 
 further curation, recipe consolidations, filtered searches, and 
 easy-to-read and access recipes. In later stages, this could be a more 
 community-driven recipe sharing and consolidation tool to access recipes 
 and try new cuisine.  
-	When we think of the journey from deciding what to cook to the process of 
+
+When we think of the journey from deciding what to cook to the process of 
 choosing a recipe, there are many obstacles that can make this process 
 time-consuming and inefficient. First, a user could be dealing with a 
 multitude of options on Google where they must comb through where there 
@@ -17,35 +19,35 @@ it hard to find. Or even worse, they are faced with an Odyssey-level story
 of some woman’s grandmother’s backstory that they simply don’t care about. 
 Imagine a seamless app that provides just the information that is needed 
 in a recipe, with search functionality to speed up the process of turning 
-ideas into full blown meals.
+ideas into full blown meals.  
 
 ## User Research & Problem Definition 
 ### User Journeys (All Users) 
 1. User navigates to site, clicks the create account button, creates 
 a user profile with demographic information (Age, Cooking Level, 
 Allergies, etc.) 
-2. Given no account: 
+2. Given no account:  
 	a. User visits website --> given a simple search interface --> The 
 user searches for a recipe and is presented with a list view of recipes 
 options with a simple image of the recipe and a name aggregated from 
 various food blogs.  
-3. User can input blogs or sites with specific names to prime the 
+4. User can input blogs or sites with specific names to prime the 
 search functionality to only return options from those sources to create 
 more specific and curated options that are not as cumbersome to look 
 through 
-4. Users click into the search button, have searched return, and can 
+5. Users click into the search button, have searched return, and can 
 filter the options based on criteria (Time to make, ingredients available, 
 cuisine type) 
-5. When a user finally finds a recipe in the list view they find 
+6. When a user finally finds a recipe in the list view they find 
 appealing, they are brought to a recipe detail page with image, 
 ingredients, and instructions 
-6. User can click into a recipe and is presented with a ingredient 
+7. User can click into a recipe and is presented with a ingredient 
 list and recipe instructions (rather than the standard long blog post 
 telling you about the author etc).   
-7. Users with accounts save a recipe to their own page, which is then 
+8. Users with accounts save a recipe to their own page, which is then 
 searchable by them and can have notes added to it by the user (e.g. “I 
 prefer to replace the cilantro with parsley in this recipe”.) 
-8. Users find a new recipe and create a manual recipe entry. This can 
+9. Users find a new recipe and create a manual recipe entry. This can 
 be saved in standalone Recipes or in the Lists tab 
  
 ### User Personas 
@@ -59,7 +61,8 @@ memories…” blog posts just to get to ingredients
 - Quick search → clean, concise recipe → cook immediately 
 - Wants to save go-to recipes in one place instead of bookmarking 
 random URLs 
-- Wants to annotate (e.g. “less chili for Ben”) 
+- Wants to annotate (e.g. “less chili for Ben”)
+  
 **Value of Product to Her**: 
 - Time savings + mental clarity 
 - One library across blogs without all the fluff 
@@ -75,8 +78,9 @@ storytelling and pop-ups, hard to know what’s “standard format”
 - Save beginner-friendly dishes and make slight tweaks as skills 
 grow 
 - Wants to search through a curated list of trusted blogs, not the 
-whole internet 
-**Value of Product to Them**:   
+whole internet
+
+**Value of Product to Them**:    
 - Feels “guided” without gatekeeping 
 - Library gives them confidence + trackable progress 
 - Notes and re-searchability help build routine 
@@ -91,7 +95,8 @@ blogs; unstructured mess
 **Primary Goals**:  
 - Aggregate from chosen sources 
 - Store and categorize her edits (“my version”) 
-- Eventually share best recipes with friends or online 
+- Eventually share best recipes with friends or online
+
 **Value of Product to Her**:   
 - Finally gives structure to hobby 
 - Allows sharing and personalization 
@@ -100,8 +105,7 @@ blogs; unstructured mess
 | **Acquisition** | **Activation** | **Retention** |
 |------------------|----------------|----------------|
 | Site Visits | Accounts Created | Repeat Visitor |
-| Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) | 1st Recipe 
-Accessed After Account Creation Rate | Recipes Saves/Opened |
+| Doesn’t Abandon Rate (Stays for 10+ seconds, 2+ clicks) | 1st Recipe Accessed After Account Creation Rate | Recipes Saves/Opened |
 |  |  | Average Session Length |
 |  |  | Recipe Searches |
 |  |  | Average Time Spent on Search Page |

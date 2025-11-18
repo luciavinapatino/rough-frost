@@ -1,3 +1,9 @@
+"""
+Django admin configuration for recipe models.
+
+Registers Recipe, Step, Tag, and Favorite models with custom admin classes
+to provide an intuitive interface for managing recipes and related data.
+"""
 from django.contrib import admin
 from .models import Recipe, Step, Tag, Favorite
 
@@ -6,19 +12,28 @@ from .models import Recipe, Step, Tag, Favorite
 class RecipeAdmin(admin.ModelAdmin):
     """
     Admin interface for Recipe model.
-    Makes it easy to view and manage recipes in the Django admin panel.
+    
+    Features:
+        - Display: title, author, creation date
+        - Filtering: by creation date and tags
+        - Search: by title and description
+        - Many-to-many: improved tag selection UI via filter_horizontal
     """
     list_display = ['title', 'author', 'created_at']
     list_filter = ['created_at', 'tags']
     search_fields = ['title', 'description']
-    filter_horizontal = ['tags']  # Better UI for selecting tags
+    filter_horizontal = ['tags']  # Better UX for many-to-many tag selection
 
 
 @admin.register(Step)
 class StepAdmin(admin.ModelAdmin):
     """
     Admin interface for Step model.
-    Shows recipe steps in a clear, organized way.
+    
+    Features:
+        - Display: recipe, step number, instruction text
+        - Filtering: by recipe
+        - Ordering: by recipe and step number
     """
     list_display = ['recipe', 'step_number', 'instruction_text']
     list_filter = ['recipe']
@@ -29,7 +44,11 @@ class StepAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     """
     Admin interface for Tag model.
-    Simple interface for managing recipe tags.
+    
+    Features:
+        - Display: tag name
+        - Search: by tag name
+        - Ordering: alphabetical (default)
     """
     list_display = ['name']
     search_fields = ['name']
@@ -39,7 +58,11 @@ class TagAdmin(admin.ModelAdmin):
 class FavoriteAdmin(admin.ModelAdmin):
     """
     Admin interface for Favorite model.
-    View which users have favorited which recipes.
+    
+    Features:
+        - Display: user, recipe, creation date
+        - Filtering: by creation date
+        - Search: by username and recipe title
     """
     list_display = ['user', 'recipe', 'created_at']
     list_filter = ['created_at']
