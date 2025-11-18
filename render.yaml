@@ -1,15 +1,16 @@
-services:
-  # PostgreSQL Database
-  - type: postgres
-    name: recipeapp-db
+# List Render Postgres databases here
+databases:
+  - name: recipeapp-db
     databaseName: recipeapp_db
     user: recipeapp_user
     plan: free  # Change to 'starter' or higher for production
 
+# List services here
+services:
   # Django Web Service
   - type: web
     name: recipeapp
-    env: python
+    runtime: python  # Changed from 'env: python'
     region: oregon  # Change to your preferred region
     plan: free  # Change to 'starter' or higher for production
     buildCommand: pip install -r requirements.txt && cd django-project && python manage.py collectstatic --noinput && python manage.py migrate
@@ -25,6 +26,4 @@ services:
         fromDatabase:
           name: recipeapp-db
           property: connectionString
-      - key: PYTHON_VERSION
-        value: 3.11.0
-
+      # Removed PYTHON_VERSION - not needed as env var
