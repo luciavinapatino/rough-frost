@@ -22,9 +22,9 @@
                     Create Recipe
                 </a>
                 {% if user.is_authenticated %}
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="color: #666; font-size: 14px;">{{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none; font-size: 14px;">Logout</a>
+                <div class="user-info">
+                    <span class="username">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none;">Logout</a>
                 </div>
                 {% else %}
                 <a href="{% url 'login' %}" class="btn-primary" style="padding: 8px 20px; text-decoration: none; font-size: 14px;">Login</a>
@@ -41,7 +41,7 @@
             </section>
 
             <div class="search-section">
-                <form method="get" action="{% url 'home' %}">
+                <form method="get" action="{% url 'home' %}" id="filterForm">
                     <div class="search-bar">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <circle cx="8" cy="8" r="6" stroke="#999" stroke-width="2" fill="none"/>
@@ -49,15 +49,103 @@
                         </svg>
                         <input type="search" name="q" value="{{ query }}" placeholder="Search by recipe name, cuisine, ingredient, or source...">
                     </div>
+
+                    <div class="filter-section">
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="cuisine">Cuisine Type:</label>
+                                <div class="custom-select">
+                                    <div class="select-display" id="cuisineDisplay" tabindex="0">All Cuisines</div>
+                                    <input type="hidden" name="cuisine" id="cuisineInput" value="{{ selected_cuisine }}">
+                                    <div class="select-dropdown" id="cuisineDropdown">
+                                        <div class="select-option" data-value="">All Cuisines</div>
+                                        {% for tag in cuisine_tags %}
+                                        <div class="select-option" data-value="{{ tag.id }}">{{ tag.name }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="dietary">Dietary Restrictions:</label>
+                                <div class="custom-multiselect">
+                                    <div class="multiselect-display" id="dietaryDisplay" tabindex="0">No Restrictions</div>
+                                    <div class="multiselect-dropdown" id="dietaryDropdown">
+                                        {% for tag in dietary_tags %}
+                                        <label class="multiselect-option">
+                                            <input type="checkbox" name="dietary" value="{{ tag.id }}"
+                                                {% if tag.id|stringformat:"s" in selected_dietary %}checked{% endif %}>
+                                            <span>{{ tag.name }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="max_time">Time to Make:</label>
+                                <div class="custom-select">
+                                    <div class="select-display" id="timeDisplay" tabindex="0">Any Time</div>
+                                    <input type="hidden" name="max_time" id="timeInput" value="{{ selected_max_time }}">
+                                    <div class="select-dropdown" id="timeDropdown">
+                                        <div class="select-option" data-value="">Any Time</div>
+                                        <div class="select-option" data-value="15">Under 15 min</div>
+                                        <div class="select-option" data-value="30">Under 30 min</div>
+                                        <div class="select-option" data-value="60">Under 1 hour</div>
+                                        <div class="select-option" data-value="120">Under 2 hours</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-actions">
+                                <button type="submit" class="btn-filter">Apply Filters</button>
+                                {% if active_filter_count > 0 or query %}
+                                <a href="{% url 'home' %}" class="btn-clear-filters">Clear All</a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if active_filter_count > 0 %}
+                        <div class="active-filters">
+                            <span class="active-filters-label">Active filters:</span>
+                            {% if selected_cuisine %}
+                                {% for tag in cuisine_tags %}
+                                    {% if tag.id|stringformat:"s" == selected_cuisine %}
+                                    <span class="filter-chip">{{ tag.name }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% for dietary_id in selected_dietary %}
+                                {% for tag in dietary_tags %}
+                                    {% if tag.id|stringformat:"s" == dietary_id %}
+                                    <span class="filter-chip dietary">{{ tag.name }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% if selected_max_time %}
+                                <span class="filter-chip time">
+                                    {% if selected_max_time == "15" %}Under 15 min
+                                    {% elif selected_max_time == "30" %}Under 30 min
+                                    {% elif selected_max_time == "60" %}Under 1 hour
+                                    {% elif selected_max_time == "120" %}Under 2 hours
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </form>
 
                 {% if query %}
                 <p class="results-count">
                     Showing {{ recipes|length }} recipe{{ recipes|length|pluralize }} for "{{ query }}"
-                    <a href="{% url 'home' %}" style="margin-left: 10px; color: #FF6B35; text-decoration: none;">Clear search</a>
+                    {% if active_filter_count > 0 %} with filters applied{% endif %}
                 </p>
                 {% else %}
-                <p class="results-count">Showing all {{ recipes|length }} recipe{{ recipes|length|pluralize }}</p>
+                <p class="results-count">
+                    Showing {{ recipes|length }} recipe{{ recipes|length|pluralize }}
+                    {% if active_filter_count > 0 %} matching your filters{% endif %}
+                </p>
                 {% endif %}
             </div>
 
@@ -95,9 +183,17 @@
                     <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
                         <h2 style="color: #666; margin-bottom: 20px;">No recipes found</h2>
                         <p style="color: #999; margin-bottom: 30px;">
-                            {% if query %}
-                                Try a different search term or
-                                <a href="{% url 'home' %}" style="color: #FF6B35;">browse all recipes</a>
+                            {% if show_filter_warning %}
+                                {% if query and active_filter_count > 0 %}
+                                    No recipes match your search and filters. Try using less restrictive criteria or
+                                    <a href="{% url 'home' %}" style="color: #FF6B35;">browse all recipes</a>
+                                {% elif query %}
+                                    No recipes match your search. Try a different search term or
+                                    <a href="{% url 'home' %}" style="color: #FF6B35;">browse all recipes</a>
+                                {% elif active_filter_count > 0 %}
+                                    No recipes match your current filters. Try using less restrictive criteria or
+                                    <a href="{% url 'home' %}" style="color: #FF6B35;">browse all recipes</a>
+                                {% endif %}
                             {% else %}
                                 Get started by creating your first recipe!
                             {% endif %}
@@ -112,5 +208,124 @@
     <footer class="main-footer">
         <p>RecipeHub - Skip the stories, get straight to cooking. 🔍</p>
     </footer>
+
+    <script>
+        // Custom dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Single-select dropdown (Cuisine & Time)
+            function initSingleSelect(displayId, dropdownId, inputId, defaultText) {
+                const display = document.getElementById(displayId);
+                const dropdown = document.getElementById(dropdownId);
+                const input = document.getElementById(inputId);
+                const options = dropdown.querySelectorAll('.select-option');
+
+                // Set initial selection
+                const initialValue = input.value;
+                if (initialValue) {
+                    const selectedOption = Array.from(options).find(opt => opt.dataset.value === initialValue);
+                    if (selectedOption) {
+                        display.textContent = selectedOption.textContent;
+                        selectedOption.classList.add('selected');
+                    }
+                }
+
+                // Toggle dropdown
+                display.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Close other dropdowns
+                    document.querySelectorAll('.select-dropdown.active, .multiselect-dropdown.active').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('active');
+                    });
+                    dropdown.classList.toggle('active');
+                    display.focus();
+                });
+
+                // Handle option selection
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const value = this.dataset.value;
+                        const text = this.textContent;
+
+                        // Update hidden input
+                        input.value = value;
+
+                        // Update display
+                        display.textContent = text;
+
+                        // Update selected state
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+
+                        // Close dropdown
+                        dropdown.classList.remove('active');
+                    });
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!dropdown.contains(e.target) && e.target !== display) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            }
+
+            // Initialize Cuisine dropdown
+            initSingleSelect('cuisineDisplay', 'cuisineDropdown', 'cuisineInput', 'All Cuisines');
+
+            // Initialize Time dropdown
+            initSingleSelect('timeDisplay', 'timeDropdown', 'timeInput', 'Any Time');
+
+            // Multi-select dropdown (Dietary Restrictions)
+            const dietaryDisplay = document.getElementById('dietaryDisplay');
+            const dietaryDropdown = document.getElementById('dietaryDropdown');
+            const checkboxes = dietaryDropdown.querySelectorAll('input[type="checkbox"]');
+
+            // Update display text based on selected checkboxes
+            function updateDietaryDisplay() {
+                const selected = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.nextElementSibling.textContent);
+
+                if (selected.length === 0) {
+                    dietaryDisplay.textContent = 'No Restrictions';
+                } else if (selected.length === 1) {
+                    dietaryDisplay.textContent = selected[0];
+                } else {
+                    dietaryDisplay.textContent = selected.length + ' selected';
+                }
+            }
+
+            // Toggle dropdown
+            dietaryDisplay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.select-dropdown.active, .multiselect-dropdown.active').forEach(d => {
+                    if (d !== dietaryDropdown) d.classList.remove('active');
+                });
+                dietaryDropdown.classList.toggle('active');
+                dietaryDisplay.focus();
+            });
+
+            // Update display when checkboxes change
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateDietaryDisplay);
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dietaryDropdown.contains(e.target) && e.target !== dietaryDisplay) {
+                    dietaryDropdown.classList.remove('active');
+                }
+            });
+
+            // Prevent dropdown from closing when clicking inside it
+            dietaryDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Initialize display on page load
+            updateDietaryDisplay();
+        });
+    </script>
 </body>
 </html>

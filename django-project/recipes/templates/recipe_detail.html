@@ -22,9 +22,9 @@
                     Create Recipe
                 </a>
                 {% if user.is_authenticated %}
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="color: #666; font-size: 14px;">{{ user.username }}</span>
-                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none; font-size: 14px;">Logout</a>
+                <div class="user-info">
+                    <span class="username">{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="nav-link" style="color: #FF6B35; text-decoration: none;">Logout</a>
                 </div>
                 {% else %}
                 <a href="{% url 'login' %}" class="btn-primary" style="padding: 8px 20px; text-decoration: none; font-size: 14px;">Login</a>
@@ -55,12 +55,42 @@
                 <div class="recipe-header">
                     <div class="recipe-title-section">
                         <h1 class="recipe-title">{{ recipe.title }}</h1>
-                        {% if tags %}
-                            <span class="cuisine-tag">{{ tags.0.name }}</span>
-                        {% endif %}
+
+                        <div class="tag-groups">
+                            {% if cuisine_tags %}
+                            <div class="tag-group">
+                                <span class="tag-label">Cuisine:</span>
+                                {% for tag in cuisine_tags %}
+                                <span class="cuisine-tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            {% if dietary_tags %}
+                            <div class="tag-group">
+                                <span class="tag-label">Dietary:</span>
+                                {% for tag in dietary_tags %}
+                                <span class="dietary-tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
 
                     <div class="recipe-meta">
+                        {% if recipe.prep_time or recipe.cook_time %}
+                        <div class="meta-item">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M10 6V10H14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>
+                                {% if recipe.prep_time %}Prep: {{ recipe.prep_time }} min{% endif %}
+                                {% if recipe.prep_time and recipe.cook_time %} | {% endif %}
+                                {% if recipe.cook_time %}Cook: {{ recipe.cook_time }} min{% endif %}
+                            </span>
+                        </div>
+                        {% endif %}
                         <div class="meta-item">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <path d="M10 3C7 3 5 5 5 7C5 7 4 7 4 8C4 9 5 9 5 9V13C5 14.5 7 16 10 16C13 16 15 14.5 15 13V9C15 9 16 9 16 8C16 7 15 7 15 7C15 5 13 3 10 3Z" fill="currentColor"/>
@@ -74,14 +104,6 @@
                             </svg>
                             <span>By {{ recipe.author.username }}</span>
                         </div>
-                        {% if tags|length > 1 %}
-                        <div class="meta-item">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M3 3L10 3L17 10L10 17L3 10Z" stroke="currentColor" stroke-width="2" fill="none"/>
-                            </svg>
-                            <span>{% for tag in tags %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
 
