@@ -36,6 +36,16 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         help_text="The user who created this recipe"
     )
+    recipe_author = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="The original recipe author or creator (e.g., 'Jamie Oliver', 'Grandma's Recipe')"
+    )
+    source_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="URL to the original recipe source (optional)"
+    )
     image_url = models.URLField(
         blank=True,
         null=True,

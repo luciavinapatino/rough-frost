@@ -13,25 +13,34 @@ from .models import Recipe, Tag
 class RecipeForm(forms.ModelForm):
     """
     Form for creating and editing recipes.
-    
-    This form extends Django's ModelForm for the Recipe model and adds two additional
+
+    This form extends Django's ModelForm for the Recipe model and adds additional
     custom fields for user convenience:
-    - tags_csv: Allows users to input tags as comma-separated values instead of 
+    - cuisine_type: Dropdown to select cuisine type (Italian, Indian, etc.)
+    - tags_csv: Allows users to input tags as comma-separated values instead of
       selecting from a multi-select dropdown
-    - steps_text: Allows users to input cooking steps as newline-separated text 
+    - steps_text: Allows users to input cooking steps as newline-separated text
       instead of creating individual Step objects
-    
+
     The form handles parsing of comma-separated tags and newline-separated steps,
     which are then converted to actual database objects by the view.
     """
-    
+
+    cuisine_type = forms.ModelChoiceField(
+        queryset=Tag.objects.filter(category='cuisine').order_by('name'),
+        required=False,
+        empty_label="Select a cuisine type (optional)",
+        label='Cuisine Type',
+        help_text='Optional: Select the cuisine type for this recipe'
+    )
+
     tags_csv = forms.CharField(
         required=False,
-        label='Tags (comma-separated)',
+        label='Additional Tags (comma-separated)',
         widget=forms.TextInput(attrs={'placeholder': 'vegan, dessert, quick-meal'}),
-        help_text='Enter tags separated by commas. Tags will be created if they don\'t exist.'
+        help_text='Enter additional tags separated by commas. Tags will be created if they don\'t exist.'
     )
-    
+
     steps_text = forms.CharField(
         required=False,
         label='Steps (one per line)',
@@ -41,11 +50,25 @@ class RecipeForm(forms.ModelForm):
 
     class Meta:
         model = Recipe
-        fields = ['title', 'description', 'image_url']
+        fields = ['title', 'recipe_author', 'description', 'source_url', 'image_url', 'ingredients', 'prep_time', 'cook_time']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Brief description of the recipe'}),
+            'ingredients': forms.Textarea(attrs={'rows': 8, 'placeholder': '1 cup flour\n2 eggs\n1/2 cup sugar'}),
+            'recipe_author': forms.TextInput(attrs={'placeholder': 'e.g., Jamie Oliver, Grandma\'s Recipe'}),
+            'source_url': forms.URLInput(attrs={'placeholder': 'https://example.com/recipe'}),
+            'image_url': forms.URLInput(attrs={'placeholder': 'https://example.com/image.jpg'}),
+            'prep_time': forms.NumberInput(attrs={'placeholder': 'Minutes', 'min': '0'}),
+            'cook_time': forms.NumberInput(attrs={'placeholder': 'Minutes', 'min': '0'}),
+        }
         help_texts = {
             'title': 'The name of your recipe',
+            'recipe_author': 'Optional: The original recipe author or creator',
             'description': 'A brief description of what this recipe is',
+            'source_url': 'Optional: URL to the original recipe source',
             'image_url': 'Optional: URL to an image of the finished dish',
+            'ingredients': 'Optional: List ingredients, one per line',
+            'prep_time': 'Optional: Preparation time in minutes',
+            'cook_time': 'Optional: Cooking time in minutes',
         }
 
     def clean_tags_csv(self):
