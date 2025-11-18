@@ -92,25 +92,85 @@ def _search_recipes(query, recipes):
 
 def home(request):
     """
-    Home page displaying recipes with optional search functionality.
-    
-    Supports search via the 'q' GET parameter. Uses PostgreSQL full-text search
-    for better relevance when available, otherwise falls back to case-insensitive
-    substring matching.
-    
+    Home page displaying recipes with optional search and filter functionality.
+
+    Supports:
+    - Search via 'q' GET parameter
+    - Cuisine filter via 'cuisine' GET parameter (tag ID)
+    - Dietary restriction filter via 'dietary' GET parameter (multiple tag IDs)
+    - Time filter via 'max_time' GET parameter (minutes)
+
     Context:
-        recipes: QuerySet of Recipe objects matching the search query (if provided)
-        query: The search query string (empty if no search performed)
+        recipes: QuerySet of Recipe objects matching filters
+        query: The search query string
+        cuisine_tags: All available cuisine tags for filter dropdown
+        dietary_tags: All available dietary tags for filter dropdown
+        selected_cuisine: Currently selected cuisine tag ID
+        selected_dietary: List of selected dietary tag IDs
+        selected_max_time: Currently selected max time value
+        show_filter_warning: Boolean indicating if filters produced no results
+        active_filter_count: Number of active filters
     """
     query = request.GET.get('q', '').strip()
+    cuisine_filter = request.GET.get('cuisine', '').strip()
+    dietary_filters = request.GET.getlist('dietary')  # Multiple selections allowed
+    max_time_filter = request.GET.get('max_time', '').strip()
+
     recipes = Recipe.objects.all()
-    
+
+    # Apply search
     if query:
         recipes = _search_recipes(query, recipes)
+
+    # Apply cuisine filter
+    if cuisine_filter:
+        recipes = recipes.filter(tags__id=cuisine_filter)
+
+    # Apply dietary filters (must have ALL selected dietary tags)
+    if dietary_filters:
+        for dietary_id in dietary_filters:
+            recipes = recipes.filter(tags__id=dietary_id)
+
+    # Apply time filter
+    if max_time_filter:
+        try:
+            max_time = int(max_time_filter)
+            # Filter recipes where total_time (prep + cook) <= max_time
+            # Use Q objects to handle NULL values
+            recipes = recipes.filter(
+                Q(prep_time__isnull=False) | Q(cook_time__isnull=False)
+            ).extra(
+                where=["COALESCE(prep_time, 0) + COALESCE(cook_time, 0) <= %s"],
+                params=[max_time]
+            )
+        except ValueError:
+            pass  # Ignore invalid time values
+
+    # Remove duplicates (can occur when filtering by multiple tags)
+    recipes = recipes.distinct()
+
+    # Check if filters are active and produced no results
+    active_filter_count = (
+        (1 if cuisine_filter else 0) +
+        len(dietary_filters) +
+        (1 if max_time_filter else 0)
+    )
+    show_filter_warning = (active_filter_count > 0 or query) and not recipes.exists()
+
+    # Get all tags for filter UI
+    cuisine_tags = Tag.objects.filter(category='cuisine').order_by('name')
+    dietary_tags = Tag.objects.filter(category='dietary').order_by('name')
 
     context = {
         'recipes': recipes,
         'query': query,
+        'cuisine_tags': cuisine_tags,
+        'dietary_tags': dietary_tags,
+        'selected_cuisine': cuisine_filter,
+        'selected_dietary': dietary_filters,
+        'selected_max_time': max_time_filter,
+        'show_filter_warning': show_filter_warning,
+        'active_filter_count': active_filter_count,
     }
     return render(request, 'home.html', context)
 
@@ -169,18 +229,21 @@ def create_recipe(request):
 def recipe_detail(request, pk):
     """
     Display a single recipe with all details: title, description, author, tags, and steps.
-    
+
     Uses select_related and prefetch_related for efficient database queries.
     Raises Http404 if the recipe with the given pk is not found.
-    
+
     URL Parameters:
         pk (int): Primary key of the recipe to display
-    
+
     Context:
         recipe: The Recipe object
         steps: Ordered QuerySet of Step objects for this recipe
         tags: QuerySet of Tag objects associated with this recipe
-    
+        cuisine_tags: Tags categorized as cuisine
+        dietary_tags: Tags categorized as dietary restrictions
+        other_tags: Other uncategorized tags
+
     Returns:
         Rendered recipe_detail.html template, or Http404 if recipe not found
     """
@@ -196,10 +259,19 @@ def recipe_detail(request, pk):
 
         raise Http404("Recipe not found")
 
+    # Categorize tags
+    tags = recipe.tags.all()
+    cuisine_tags = tags.filter(category='cuisine')
+    dietary_tags = tags.filter(category='dietary')
+    other_tags = tags.filter(category='other')
+
     context = {
         'recipe': recipe,
         'steps': recipe.steps.all(),
-        'tags': recipe.tags.all(),
+        'tags': tags,
+        'cuisine_tags': cuisine_tags,
+        'dietary_tags': dietary_tags,
+        'other_tags': other_tags,
     }
     return render(request, 'recipe_detail.html', context)
 

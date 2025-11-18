@@ -54,10 +54,28 @@ class Recipe(models.Model):
         blank=True,
         help_text="Recipe ingredients, one per line"
     )
+    prep_time = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="Preparation time in minutes"
+    )
+    cook_time = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="Cooking time in minutes"
+    )
 
     class Meta:
         ordering = ['-created_at']  # Newest recipes first
-    
+
+    @property
+    def total_time(self):
+        """Calculate total time as sum of prep and cook time."""
+        prep = self.prep_time or 0
+        cook = self.cook_time or 0
+        total = prep + cook
+        return total if total > 0 else None
+
     def __str__(self):
         return self.title
 
@@ -65,19 +83,32 @@ class Recipe(models.Model):
 class Tag(models.Model):
     """
     Tag model - labels for categorizing recipes.
-    
+
     Examples: "vegan", "dessert", "gluten-free", "quick-meal"
     A recipe can have many tags, and a tag can apply to many recipes.
+    Tags are categorized as cuisine, dietary restrictions, or other.
     """
+    CATEGORY_CHOICES = [
+        ('cuisine', 'Cuisine Type'),
+        ('dietary', 'Dietary Restriction'),
+        ('other', 'Other'),
+    ]
+
     name = models.CharField(
         max_length=50,
         unique=True,
         help_text="The tag name (e.g., 'vegan', 'dessert', 'gluten-free')"
     )
-    
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default='other',
+        help_text="The category of this tag (cuisine, dietary, or other)"
+    )
+
     class Meta:
         ordering = ['name']  # Alphabetical order
-    
+
     def __str__(self):
         return self.name
 

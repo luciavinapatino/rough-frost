@@ -99,15 +99,49 @@ def main():
     })
     print(f'✓ Users: alice and bob')
 
-    # Create tags
-    italian, _ = Tag.objects.get_or_create(name='Italian')
-    indian, _ = Tag.objects.get_or_create(name='Indian')
-    american, _ = Tag.objects.get_or_create(name='American')
-    greek, _ = Tag.objects.get_or_create(name='Greek')
-    mexican, _ = Tag.objects.get_or_create(name='Mexican')
-    asian, _ = Tag.objects.get_or_create(name='Asian')
-    vegetarian, _ = Tag.objects.get_or_create(name='Vegetarian')
-    print(f'✓ Tags: Italian, Indian, American, Greek, Mexican, Asian, Vegetarian')
+    # Create cuisine tags
+    italian, _ = Tag.objects.get_or_create(name='Italian', defaults={'category': 'cuisine'})
+    italian.category = 'cuisine'
+    italian.save()
+
+    indian, _ = Tag.objects.get_or_create(name='Indian', defaults={'category': 'cuisine'})
+    indian.category = 'cuisine'
+    indian.save()
+
+    american, _ = Tag.objects.get_or_create(name='American', defaults={'category': 'cuisine'})
+    american.category = 'cuisine'
+    american.save()
+
+    greek, _ = Tag.objects.get_or_create(name='Greek', defaults={'category': 'cuisine'})
+    greek.category = 'cuisine'
+    greek.save()
+
+    mexican, _ = Tag.objects.get_or_create(name='Mexican', defaults={'category': 'cuisine'})
+    mexican.category = 'cuisine'
+    mexican.save()
+
+    asian, _ = Tag.objects.get_or_create(name='Asian', defaults={'category': 'cuisine'})
+    asian.category = 'cuisine'
+    asian.save()
+
+    # Create dietary restriction tags
+    vegetarian, _ = Tag.objects.get_or_create(name='Vegetarian', defaults={'category': 'dietary'})
+    vegetarian.category = 'dietary'
+    vegetarian.save()
+
+    vegan, _ = Tag.objects.get_or_create(name='Vegan', defaults={'category': 'dietary'})
+    vegan.category = 'dietary'
+    vegan.save()
+
+    gluten_free, _ = Tag.objects.get_or_create(name='Gluten-Free', defaults={'category': 'dietary'})
+    gluten_free.category = 'dietary'
+    gluten_free.save()
+
+    dairy_free, _ = Tag.objects.get_or_create(name='Dairy-Free', defaults={'category': 'dietary'})
+    dairy_free.category = 'dietary'
+    dairy_free.save()
+
+    print(f'✓ Tags: Cuisine (Italian, Indian, American, Greek, Mexican, Asian) + Dietary (Vegetarian, Vegan, Gluten-Free, Dairy-Free)')
 
     # Create 7 diverse recipes
     recipes_data = [
@@ -117,6 +151,8 @@ def main():
             'author': alice,
             'image_url': 'https://via.placeholder.com/400x300/FFD700/333333?text=Spaghetti+Carbonara',
             'tags': [italian],
+            'prep_time': 10,
+            'cook_time': 20,
             'ingredients': '''1 lb spaghetti
 6 oz pancetta or guanciale, diced
 4 large eggs
@@ -138,7 +174,9 @@ Salt for pasta water''',
             'description': 'Rich and aromatic Indian curry with tender chicken pieces in a tomato-based sauce with cream and warming spices like garam masala.',
             'author': bob,
             'image_url': 'https://via.placeholder.com/400x300/FF8C00/333333?text=Chicken+Curry',
-            'tags': [indian],
+            'tags': [indian, gluten_free],
+            'prep_time': 15,
+            'cook_time': 35,
             'ingredients': '''2 lbs boneless chicken thighs, cut into pieces
 2 large onions, finely chopped
 3 tbsp ginger-garlic paste
@@ -164,7 +202,9 @@ Salt to taste''',
             'description': 'The ultimate chocolate chip cookies with crispy edges and a soft, chewy center. Loaded with chocolate chips in every bite.',
             'author': alice,
             'image_url': 'https://via.placeholder.com/400x300/8B4513/FFFFFF?text=Chocolate+Cookies',
-            'tags': [american],
+            'tags': [american, vegetarian],
+            'prep_time': 15,
+            'cook_time': 12,
             'ingredients': '''2 1/4 cups all-purpose flour
 1 cup unsalted butter, softened
 3/4 cup granulated sugar
@@ -190,7 +230,9 @@ Salt to taste''',
             'description': 'Crisp vegetables, tangy feta cheese, and Kalamata olives dressed simply with olive oil and lemon juice.',
             'author': bob,
             'image_url': 'https://via.placeholder.com/400x300/32CD32/333333?text=Greek+Salad',
-            'tags': [greek, vegetarian],
+            'tags': [greek, vegetarian, gluten_free],
+            'prep_time': 15,
+            'cook_time': 0,
             'ingredients': '''4 large tomatoes, chopped
 2 cucumbers, sliced
 1 red onion, thinly sliced
@@ -213,7 +255,9 @@ Salt and pepper to taste''',
             'description': 'Authentic Mexican street tacos with marinated grilled chicken, fresh cilantro, onions, and a squeeze of lime on soft corn tortillas.',
             'author': alice,
             'image_url': 'https://via.placeholder.com/400x300/FF6347/FFFFFF?text=Chicken+Tacos',
-            'tags': [mexican],
+            'tags': [mexican, gluten_free, dairy_free],
+            'prep_time': 70,
+            'cook_time': 15,
             'ingredients': '''2 lbs boneless chicken thighs
 12 small corn tortillas
 Juice of 3 limes
@@ -239,7 +283,9 @@ Salt to taste''',
             'description': 'Quick and flavorful stir-fry with tender beef strips, crisp vegetables, and a savory soy-ginger sauce served over rice.',
             'author': bob,
             'image_url': 'https://via.placeholder.com/400x300/8B0000/FFFFFF?text=Beef+Stir-Fry',
-            'tags': [asian],
+            'tags': [asian, dairy_free],
+            'prep_time': 20,
+            'cook_time': 15,
             'ingredients': '''1.5 lbs flank steak, thinly sliced
 1/4 cup soy sauce
 2 tbsp cornstarch
@@ -267,7 +313,9 @@ Cooked rice for serving''',
             'description': 'Nourishing vegetarian bowl packed with roasted vegetables, quinoa, chickpeas, and creamy tahini dressing.',
             'author': alice,
             'image_url': 'https://via.placeholder.com/400x300/9370DB/FFFFFF?text=Buddha+Bowl',
-            'tags': [vegetarian],
+            'tags': [vegetarian, vegan, gluten_free, dairy_free],
+            'prep_time': 20,
+            'cook_time': 30,
             'ingredients': '''1 cup quinoa
 1 can (15 oz) chickpeas, drained
 1 large sweet potato, cubed
@@ -300,6 +348,8 @@ Salt and pepper to taste''',
                 'author': recipe_data['author'],
                 'image_url': recipe_data['image_url'],
                 'ingredients': recipe_data.get('ingredients', ''),
+                'prep_time': recipe_data.get('prep_time'),
+                'cook_time': recipe_data.get('cook_time'),
                 'created_at': timezone.now(),
             }
         )
@@ -307,6 +357,8 @@ Salt and pepper to taste''',
         recipe.image_url = recipe_data['image_url']
         recipe.description = recipe_data['description']
         recipe.ingredients = recipe_data.get('ingredients', '')
+        recipe.prep_time = recipe_data.get('prep_time')
+        recipe.cook_time = recipe_data.get('cook_time')
         recipe.save()
 
         for tag in recipe_data['tags']:
