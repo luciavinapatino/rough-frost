@@ -5,7 +5,7 @@ Registers Recipe, Step, Tag, and Favorite models with custom admin classes
 to provide an intuitive interface for managing recipes and related data.
 """
 from django.contrib import admin
-from .models import Recipe, Step, Tag, Favorite
+from .models import Recipe, Step, Tag, Favorite, ABTestImpression, ABTestClick
 
 
 @admin.register(Recipe)
@@ -23,6 +23,8 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ['created_at', 'tags']
     search_fields = ['title', 'description']
     filter_horizontal = ['tags']  # Better UX for many-to-many tag selection
+admin.site.register(ABTestImpression)
+admin.site.register(ABTestClick)
 
 
 @admin.register(Step)

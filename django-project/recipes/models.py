@@ -185,3 +185,49 @@ class Favorite(models.Model):
     
     def __str__(self):
         return f"{self.user.username} favorited {self.recipe.title}"
+
+
+class ABTestImpression(models.Model):
+    """
+    Log of AB test impressions (one row per page view).
+
+    Stores variant ('A' or 'B'), request path, optional IP and user-agent,
+    and a timestamp. This is intentionally lightweight and suitable for
+    counting impressions per variant.
+    """
+    VARIANT_CHOICES = [
+        ('A', 'Variant A'),
+        ('B', 'Variant B'),
+    ]
+
+    variant = models.CharField(max_length=1, choices=VARIANT_CHOICES)
+    path = models.CharField(max_length=255)
+    ip_address = models.CharField(max_length=45, null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"AB impression {self.variant} @ {self.path} on {self.created_at.isoformat()}"
+
+
+class ABTestClick(models.Model):
+    """
+    Records clicks on the AB test button. Each click may be linked to the
+    impression that generated the page view (optional). Stores variant,
+    path, optional IP and user-agent, and timestamp.
+    """
+    impression = models.ForeignKey(ABTestImpression, null=True, blank=True, on_delete=models.SET_NULL)
+    variant = models.CharField(max_length=1, choices=ABTestImpression.VARIANT_CHOICES)
+    path = models.CharField(max_length=255)
+    ip_address = models.CharField(max_length=45, null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"AB click {self.variant} @ {self.path} on {self.created_at.isoformat()}"

@@ -5,7 +5,9 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.db.models import Q
 from django.db import connection
 
-from .models import Recipe, Tag, Step
+from .models import Recipe, Tag, Step, ABTestImpression, ABTestClick
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_POST
 from .forms import RecipeForm
 
 
@@ -285,6 +287,101 @@ def recipe_detail(request, pk):
         'other_tags': other_tags,
     }
     return render(request, 'recipe_detail.html', context)
+
+
+def abtest_view(request):
+    """
+    Public AB test page at /c50afae showing team member nicknames and
+    a button with id="abtest" whose text alternates between
+    "kudos" (Variant A) and "thanks" (Variant B).
+
+    The variant is chosen randomly on first visit and persisted to
+    `localStorage` by the client-side JavaScript so the user sees a
+    consistent variant across page reloads.
+    """
+    # Team member nicknames (from team-charter.md)
+    team_nicknames = ['Lucia', 'Nick', 'Will', 'Daniel']
+
+    # Stateless per-request 50/50 draw: choose a fresh variant on every page
+    # load and log each impression to the DB. This gives per-page-view
+    # impression counts while avoiding persistent cookies.
+    import random
+    variant = 'A' if random.random() < 0.5 else 'B'
+    label = 'kudos' if variant == 'A' else 'thanks'
+
+    # Log impression (capture the instance so clicks can link to it)
+    impression = None
+    try:
+        impression = ABTestImpression.objects.create(
+            variant=variant,
+            path=request.path,
+            ip_address=request.META.get('REMOTE_ADDR'),
+            user_agent=(request.META.get('HTTP_USER_AGENT') or '')[:2000],
+        )
+    except Exception:
+        # swallow DB exceptions to keep the experiment page available
+        impression = None
+
+    return render(request, 'abtest.html', {
+        'team_nicknames': team_nicknames,
+        'ab_variant': variant,
+        'ab_label': label,
+        'impression_id': impression.pk if impression is not None else None,
+    })
+
+
+
+@require_POST
+def abtest_click(request):
+    """Handle AJAX POST when a visitor clicks the AB test button.
+
+    Expects JSON or form data with:
+      - impression_id (optional): integer PK of ABTestImpression
+      - variant: 'A' or 'B'
+
+    Returns JSON { 'ok': True }
+    """
+    try:
+        data = request.POST if request.POST else request.body
+    except Exception:
+        data = request.POST
+
+    # Support JSON body
+    variant = request.POST.get('variant') or None
+    impression_id = request.POST.get('impression_id') or None
+    if not variant:
+        # Attempt JSON decode
+        try:
+            import json
+            payload = json.loads(request.body.decode('utf-8') or '{}')
+            variant = payload.get('variant')
+            impression_id = impression_id or payload.get('impression_id')
+        except Exception:
+            pass
+
+    if variant not in ('A', 'B'):
+        return HttpResponseBadRequest('invalid variant')
+
+    imp = None
+    try:
+        if impression_id:
+            imp = ABTestImpression.objects.filter(pk=int(impression_id)).first()
+    except Exception:
+        imp = None
+
+    try:
+        ABTestClick.objects.create(
+            impression=imp,
+            variant=variant,
+            path=request.path,  # this will be the click endpoint path; impression.path stores page path
+            ip_address=request.META.get('REMOTE_ADDR'),
+            user_agent=(request.META.get('HTTP_USER_AGENT') or '')[:2000]
+        )
+    except Exception:
+        # swallow DB errors but return success so UX isn't affected
+        return JsonResponse({'ok': True})
+
+    return JsonResponse({'ok': True})
 
 
 def login_view(request):
