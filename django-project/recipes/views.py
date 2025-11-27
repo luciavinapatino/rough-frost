@@ -302,8 +302,13 @@ def abtest_view(request):
     `localStorage` by the client-side JavaScript so the user sees a
     consistent variant across page reloads.
     """
-    # Team member nicknames (from team-charter.md)
-    team_nicknames = ['Lucia', 'Nick', 'Will', 'Daniel']
+    # Team member nicknames (project handles)
+    team_nicknames = [
+        'zealous-newt',
+        'rich-manatee',
+        'excited-leopard',
+        'motionless-horse'
+    ]
 
     # Stateless per-request 50/50 draw: choose a fresh variant on every page
     # load and log each impression to the DB. This gives per-page-view
