@@ -13,7 +13,7 @@ services:
     runtime: python  # Changed from 'env: python'
     region: oregon  # Change to your preferred region
     plan: free  # Change to 'starter' or higher for production
-    buildCommand: pip install -r requirements.txt && cd django-project && python manage.py collectstatic --noinput && python manage.py migrate
+    buildCommand: pip install -r requirements.txt && cd django-project && python manage.py collectstatic --noinput && python manage.py migrate && python seed_data.py
     startCommand: cd django-project && gunicorn recipeapp.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: SECRET_KEY

@@ -99,11 +99,12 @@ def main():
     })
     # Create a default admin user for development if it doesn't exist
     admin_user, created = User.objects.get_or_create(username='admin', defaults={'email': 'admin@example.com'})
-    if created or not admin_user.has_usable_password():
-        admin_user.set_password('adminpass')
-        admin_user.is_superuser = True
-        admin_user.is_staff = True
-        admin_user.save()
+    # For the school project we always reset the admin password on seed so
+    # the team can reliably log in on each deploy without extra steps.
+    admin_user.set_password('adminpass')
+    admin_user.is_superuser = True
+    admin_user.is_staff = True
+    admin_user.save()
     print('✓ Admin user: username=admin password=adminpass')
     print(f'✓ Users: alice and bob')
 
