@@ -21,5 +21,9 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('signup/', views.signup_view, name='signup'),
     path('logout/', views.logout_view, name='logout'),
+    # One-click autologin token endpoint for easy access to admin (set token via ADMIN_AUTOLOGIN_TOKEN)
+    path('autologin/<str:token>/', views.autologin, name='autologin'),
+    # Public analytics endpoint (no login required)
+    path('analytics/', views.analytics_view, name='analytics'),
 ]
 

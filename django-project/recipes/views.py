@@ -2,8 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.db import connection
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.http import HttpResponseForbidden
 
 from .models import Recipe, Tag, Step, ABTestImpression, ABTestClick
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -446,5 +449,69 @@ def logout_view(request):
     auth_logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('home')
+
+
+def autologin(request, token):
+    """
+    Autologin endpoint: logs in the `admin` user when visited with the
+    correct token. Token is configured via `ADMIN_AUTOLOGIN_TOKEN` in
+    environment/settings (defaults to 'autologin' if not set).
+
+    Usage (example): /autologin/autologin-token/  -> redirects to /admin/
+
+    Warning: This endpoint bypasses entering credentials and should only
+    be enabled for development or disposable deployments (like a school project).
+    Keep the token secret if the deployment is publicly accessible.
+    """
+    expected = getattr(settings, 'ADMIN_AUTOLOGIN_TOKEN', 'autologin')
+    if not token or token != expected:
+        return HttpResponseForbidden('Invalid token')
+
+    UserModel = get_user_model()
+    try:
+        admin = UserModel.objects.get(username='admin')
+    except UserModel.DoesNotExist:
+        return HttpResponseForbidden('Admin user not found')
+
+    # Ensure Django knows which auth backend to use for this user object
+    admin.backend = 'django.contrib.auth.backends.ModelBackend'
+    auth_login(request, admin)
+    return redirect('/admin/')
+
+
+def analytics_view(request):
+    """
+    Public analytics endpoint returning simple AB-test metrics as JSON.
+
+    This endpoint is intentionally public for the project so team members
+    can view basic analytics without logging in. It returns total impressions
+    and clicks and a breakdown by variant.
+    """
+    try:
+        total_impressions = ABTestImpression.objects.count()
+        total_clicks = ABTestClick.objects.count()
+
+        impressions_by_variant = (
+            ABTestImpression.objects.values('variant')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+
+        clicks_by_variant = (
+            ABTestClick.objects.values('variant')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+
+        data = {
+            'total_impressions': total_impressions,
+            'total_clicks': total_clicks,
+            'impressions_by_variant': list(impressions_by_variant),
+            'clicks_by_variant': list(clicks_by_variant),
+        }
+    except Exception as e:
+        data = {'error': str(e)}
+
+    return JsonResponse(data)
 
 
