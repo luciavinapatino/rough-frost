@@ -484,7 +484,7 @@ def autologin(request, token):
     return redirect('/admin/')
 
 
-def analytics_view(request):
+def analytics_data(request):
     """
     Public analytics endpoint returning simple AB-test metrics as JSON.
 
@@ -520,11 +520,11 @@ def analytics_view(request):
     return JsonResponse(data)
 
 
-def analytics_dashboard(request):
+def analytics_view(request):
     """
     Render an HTML dashboard that fetches the JSON analytics endpoint
     and displays a nicer layout and charts. The actual analytics data
-    continues to be served by `analytics_view` as JSON; this view simply
+    continues to be served by `analytics_data` as JSON; this view simply
     renders the dashboard page which queries that endpoint via JavaScript.
     """
     # Variant label mapping used on the AB test page
