@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Analytics Dashboard</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 18px; background:#f7f7fb; color:#111; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { margin-bottom: 6px; }
+    .row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+    .card { background:white; border-radius:8px; padding:14px 18px; box-shadow: 0 6px 18px rgba(20,20,50,0.06); flex:1 1 200px; }
+    .card h3 { margin:0 0 6px 0; font-size:14px; color:#555; }
+    .card .value { font-size:22px; font-weight:600; }
+    .variant-list { margin-top:8px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { text-align:left; padding:8px; border-bottom:1px solid #eee; }
+    .small { font-size:13px; color:#666; }
+    .charts { display:flex; gap:18px; flex-wrap:wrap; }
+    .chart-card { background:white; padding:12px; border-radius:8px; box-shadow: 0 6px 18px rgba(20,20,50,0.06); flex:1 1 420px; }
+  </style>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>AB Test Analytics</h1>
+    <p class="small">This dashboard pulls metrics from the public JSON endpoint and renders summary cards and charts.</p>
+
+    <div class="row" id="summaries">
+      <div class="card">
+        <h3>Total Impressions</h3>
+        <div class="value" id="total-impressions">—</div>
+      </div>
+      <div class="card">
+        <h3>Total Clicks</h3>
+        <div class="value" id="total-clicks">—</div>
+      </div>
+      <div class="card">
+        <h3>Overall Conversion</h3>
+        <div class="value" id="conversion">—</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="card" style="flex:1 1 320px">
+        <h3>Variants</h3>
+        <div class="variant-list">
+          <table>
+            <thead>
+              <tr><th>Variant</th><th>Label</th><th>Impressions</th><th>Clicks</th><th>Conversion</th></tr>
+            </thead>
+            <tbody id="variant-rows">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="flex:1 1 340px">
+        <h3>Notes</h3>
+        <p class="small">Labels are the text shown to users on the AB test page. Option A = <strong>{{ variant_labels.A }}</strong>, Option B = <strong>{{ variant_labels.B }}</strong>.</p>
+        <p class="small">The charts below show distribution and conversion rates.</p>
+      </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-card">
+        <h3>Impressions by Variant</h3>
+        <canvas id="impressionsChart" height="160"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Clicks by Variant</h3>
+        <canvas id="clicksChart" height="160"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    window.__VARIANT_LABEL_A = "{{ variant_labels.A }}";
+    window.__VARIANT_LABEL_B = "{{ variant_labels.B }}";
+    window.ANALYTICS_URL = "{% url 'analytics' %}";
+  </script>
+  <script src="{% static 'recipes/js/analytics.js' %}"></script>
+</body>
+</html>
