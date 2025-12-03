@@ -4,85 +4,321 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Analytics Dashboard</title>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 18px; background:#f7f7fb; color:#111; }
-    .container { max-width: 1000px; margin: 0 auto; }
-    h1 { margin-bottom: 6px; }
-    .row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
-    .card { background:white; border-radius:8px; padding:14px 18px; box-shadow: 0 6px 18px rgba(20,20,50,0.06); flex:1 1 200px; }
-    .card h3 { margin:0 0 6px 0; font-size:14px; color:#555; }
-    .card .value { font-size:22px; font-weight:600; }
-    .variant-list { margin-top:8px; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { text-align:left; padding:8px; border-bottom:1px solid #eee; }
-    .small { font-size:13px; color:#666; }
-    .charts { display:flex; gap:18px; flex-wrap:wrap; }
-    .chart-card { background:white; padding:12px; border-radius:8px; box-shadow: 0 6px 18px rgba(20,20,50,0.06); flex:1 1 420px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .metric-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .metric-label {
+      color: #666;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-subtitle {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    .table-section {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 1.5rem;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f8f9fa;
+    }
+
+    th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #667eea;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      color: #555;
+    }
+
+    tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .label-badge {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .label-a {
+      background: #667eea;
+    }
+
+    .label-b {
+      background: #764ba2;
+    }
+
+    .number-large {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 1.1rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+    }
+
+    .error {
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c33;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .metric-value {
+        font-size: 2rem;
+      }
+
+      .table-section {
+        padding: 1.5rem;
+      }
+
+      th, td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
   </style>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>AB Test Analytics</h1>
-    <p class="small">This dashboard pulls metrics from the public JSON endpoint and renders summary cards and charts.</p>
+    <header>
+      <h1>📊 Analytics Dashboard</h1>
+      <p class="subtitle">AB Test Performance Metrics</p>
+    </header>
 
-    <div class="row" id="summaries">
-      <div class="card">
-        <h3>Total Impressions</h3>
-        <div class="value" id="total-impressions">—</div>
+    <div id="error" class="error" style="display:none;"></div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Impressions</div>
+        <div class="metric-value" id="total-impressions">—</div>
       </div>
-      <div class="card">
-        <h3>Total Clicks</h3>
-        <div class="value" id="total-clicks">—</div>
+      <div class="metric-card">
+        <div class="metric-label">Total Clicks</div>
+        <div class="metric-value" id="total-clicks">—</div>
       </div>
-      <div class="card">
-        <h3>Overall Conversion</h3>
-        <div class="value" id="conversion">—</div>
+      <div class="metric-card">
+        <div class="metric-label">Conversion Rate</div>
+        <div class="metric-value" id="conversion-rate">—</div>
+        <div class="metric-subtitle" id="conversion-subtitle"></div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="card" style="flex:1 1 320px">
-        <h3>Variants</h3>
-        <div class="variant-list">
-          <table>
-            <thead>
-              <tr><th>Variant</th><th>Label</th><th>Impressions</th><th>Clicks</th><th>Conversion</th></tr>
-            </thead>
-            <tbody id="variant-rows">
-              <!-- populated by JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card" style="flex:1 1 340px">
-        <h3>Notes</h3>
-        <p class="small">Labels are the text shown to users on the AB test page. Option A = <strong>{{ variant_labels.A }}</strong>, Option B = <strong>{{ variant_labels.B }}</strong>.</p>
-        <p class="small">The charts below show distribution and conversion rates.</p>
-      </div>
+    <div class="table-section">
+      <h2 class="section-title">Variant Performance</h2>
+      <table id="variants-table">
+        <thead>
+          <tr>
+            <th>Variant</th>
+            <th>Impressions</th>
+            <th>Clicks</th>
+            <th>Conversion Rate</th>
+          </tr>
+        </thead>
+        <tbody id="variants-body">
+          <tr>
+            <td colspan="4" class="loading">Loading analytics data...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
-    <div class="charts">
-      <div class="chart-card">
-        <h3>Impressions by Variant</h3>
-        <canvas id="impressionsChart" height="160"></canvas>
-      </div>
-      <div class="chart-card">
-        <h3>Clicks by Variant</h3>
-        <canvas id="clicksChart" height="160"></canvas>
-      </div>
-    </div>
-
   </div>
 
   <script>
-    window.__VARIANT_LABEL_A = "{{ variant_labels.A }}";
-    window.__VARIANT_LABEL_B = "{{ variant_labels.B }}";
-    window.ANALYTICS_URL = "/analytics/data/";
+    const variantLabels = {
+      'A': 'kudos',
+      'B': 'thanks'
+    };
+
+    function formatPercent(value) {
+      if (value === null || value === undefined) return '—';
+      return (value * 100).toFixed(1) + '%';
+    }
+
+    function getVariantLabel(variant) {
+      return variantLabels[variant] || variant;
+    }
+
+    function getVariantBadgeClass(variant) {
+      return variant === 'A' ? 'label-a' : 'label-b';
+    }
+
+    fetch('/analytics/')
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+          document.getElementById('error').style.display = 'block';
+          document.getElementById('error').textContent = 'Error loading analytics: ' + data.error;
+          return;
+        }
+
+        const totalImpr = data.total_impressions || 0;
+        const totalClicks = data.total_clicks || 0;
+        const conversionRate = totalImpr > 0 ? totalClicks / totalImpr : 0;
+
+        // Update metric cards
+        document.getElementById('total-impressions').textContent = totalImpr.toLocaleString();
+        document.getElementById('total-clicks').textContent = totalClicks.toLocaleString();
+        document.getElementById('conversion-rate').textContent = formatPercent(conversionRate);
+        document.getElementById('conversion-subtitle').textContent = `${totalClicks} clicks from ${totalImpr} impressions`;
+
+        // Build variants table
+        const tbody = document.getElementById('variants-body');
+        tbody.innerHTML = '';
+
+        const impressionMap = {};
+        const clicksMap = {};
+
+        // Populate maps from data
+        (data.impressions_by_variant || []).forEach(item => {
+          const variant = item.variant;
+          impressionMap[variant] = item.count;
+        });
+
+        (data.clicks_by_variant || []).forEach(item => {
+          const variant = item.variant;
+          clicksMap[variant] = item.count;
+        });
+
+        // Display both variants
+        ['A', 'B'].forEach(variant => {
+          const impressions = impressionMap[variant] || 0;
+          const clicks = clicksMap[variant] || 0;
+          const convRate = impressions > 0 ? clicks / impressions : 0;
+          const label = getVariantLabel(variant);
+          const badgeClass = getVariantBadgeClass(variant);
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><span class="label-badge ${badgeClass}">${variant}: ${label}</span></td>
+            <td class="number-large">${impressions.toLocaleString()}</td>
+            <td class="number-large">${clicks.toLocaleString()}</td>
+            <td>${formatPercent(convRate)}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching analytics:', error);
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'Failed to load analytics data. Please try again later.';
+        document.getElementById('variants-body').innerHTML = '<tr><td colspan="4" class="error">Failed to load data</td></tr>';
+      });
   </script>
-  <script src="{% static 'recipes/js/analytics.js' %}"></script>
 </body>
 </html>
+
