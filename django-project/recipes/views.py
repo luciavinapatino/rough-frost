@@ -379,6 +379,51 @@ def edit_recipe(request, pk):
     return render(request, 'edit_recipe.html', {'form': form, 'recipe': recipe})
 
 
+def delete_recipe(request, pk):
+    """
+    Delete an existing recipe.
+
+    Only the recipe author can delete their own recipes. Requires POST method
+    for security. Displays confirmation dialog via JavaScript before deletion.
+
+    URL Parameters:
+        pk (int): Primary key of the recipe to delete
+
+    Returns:
+        POST: Redirect to home with success message after deletion
+        403: If user is not the recipe author
+        404: If recipe not found
+        405: If request method is not POST
+    """
+    from django.http import Http404, HttpResponseNotAllowed
+
+    # Only allow POST requests for deletion
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    # Get the recipe
+    recipe = (
+        Recipe.objects.select_related('author')
+        .filter(pk=pk)
+        .first()
+    )
+    if not recipe:
+        raise Http404("Recipe not found")
+
+    # Check authorization
+    if request.user != recipe.author:
+        return HttpResponseForbidden("You don't have permission to delete this recipe")
+
+    # Store recipe title for success message
+    recipe_title = recipe.title
+
+    # Delete the recipe (cascading deletes will handle steps and tags)
+    recipe.delete()
+
+    messages.success(request, f'Recipe "{recipe_title}" has been deleted successfully.')
+    return redirect('home')
+
+
 def abtest_view(request):
     """
     Public AB test page at /c50afae showing team member nicknames and

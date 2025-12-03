@@ -54,15 +54,27 @@
 
                 <div class="recipe-header">
                     <div class="recipe-title-section">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                             <h1 class="recipe-title" style="margin: 0;">{{ recipe.title }}</h1>
                             {% if user.is_authenticated and user == recipe.author %}
-                            <a href="{% url 'edit_recipe' recipe.pk %}" class="btn-primary" style="padding: 10px 20px; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                                    <path d="M14.5 2.5C14.8978 2.10217 15.4374 1.87868 16 1.87868C16.2786 1.87868 16.5544 1.93355 16.8118 2.04015C17.0692 2.14674 17.303 2.303 17.5 2.5C17.697 2.697 17.8533 2.93079 17.9599 3.18819C18.0665 3.44558 18.1214 3.72142 18.1214 4C18.1214 4.27858 18.0665 4.55442 17.9599 4.81181C17.8533 5.06921 17.697 5.303 17.5 5.5L6.5 16.5L2 18L3.5 13.5L14.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                Edit
-                            </a>
+                            <div style="display: flex; gap: 6px;">
+                                <a href="{% url 'edit_recipe' recipe.pk %}" title="Edit recipe" style="padding: 6px 10px; background-color: #FF6B35; color: white; text-decoration: none; font-size: 12px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                                        <path d="M14.5 2.5C14.8978 2.10217 15.4374 1.87868 16 1.87868C16.2786 1.87868 16.5544 1.93355 16.8118 2.04015C17.0692 2.14674 17.303 2.303 17.5 2.5C17.697 2.697 17.8533 2.93079 17.9599 3.18819C18.0665 3.44558 18.1214 3.72142 18.1214 4C18.1214 4.27858 18.0665 4.55442 17.9599 4.81181C17.8533 5.06921 17.697 5.303 17.5 5.5L6.5 16.5L2 18L3.5 13.5L14.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span style="font-size: 11px;">Edit</span>
+                                </a>
+                                <form method="post" action="{% url 'delete_recipe' recipe.pk %}" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this recipe? This action cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" title="Delete recipe" style="padding: 6px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-family: inherit;">
+                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+                                            <path d="M3 6H5H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2C10.5304 2 11.0391 2.21071 11.4142 2.58579C11.7893 2.96086 12 3.46957 12 4V6M15 6V16C15 16.5304 14.7893 17.0391 14.4142 17.4142C14.0391 17.7893 13.5304 18 13 18H7C6.46957 18 5.96086 17.7893 5.58579 17.4142C5.21071 17.0391 5 16.5304 5 16V6H15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <span style="font-size: 11px;">Delete</span>
+                                    </button>
+                                </form>
+                            </div>
                             {% endif %}
                         </div>
 
