@@ -89,12 +89,12 @@ class RecipeForm(forms.ModelForm):
     def clean_title(self):
         """
         Validate recipe title field.
-        
+
         Ensures the title is not empty after stripping whitespace.
-        
+
         Returns:
             str: Cleaned title
-            
+
         Raises:
             ValidationError: If title is empty or only whitespace
         """
@@ -102,3 +102,29 @@ class RecipeForm(forms.ModelForm):
         if not title:
             raise forms.ValidationError('Recipe title cannot be empty.')
         return title
+
+    def clean_image_url(self):
+        """
+        Clean the image_url field to properly handle empty values.
+
+        Converts empty strings to None to prevent overwriting existing URLs
+        with empty strings when the field is left unchanged during edits.
+
+        Returns:
+            str or None: The URL if provided, None if empty
+        """
+        url = self.cleaned_data.get('image_url', '').strip()
+        return url if url else None
+
+    def clean_source_url(self):
+        """
+        Clean the source_url field to properly handle empty values.
+
+        Converts empty strings to None to prevent overwriting existing URLs
+        with empty strings when the field is left unchanged during edits.
+
+        Returns:
+            str or None: The URL if provided, None if empty
+        """
+        url = self.cleaned_data.get('source_url', '').strip()
+        return url if url else None
