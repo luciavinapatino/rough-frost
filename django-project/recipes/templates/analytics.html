@@ -254,7 +254,7 @@
       return variant === 'A' ? 'label-a' : 'label-b';
     }
 
-    fetch('/analytics/')
+    fetch('/analytics/json/')
       .then(response => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();

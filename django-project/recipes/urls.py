@@ -25,5 +25,6 @@ urlpatterns = [
     path('autologin/<str:token>/', views.autologin, name='autologin'),
     # Public analytics endpoint (no login required)
     path('analytics/', views.analytics_view, name='analytics'),
+    path('analytics/json/', views.analytics_data_json, name='analytics_json'),
 ]
 
