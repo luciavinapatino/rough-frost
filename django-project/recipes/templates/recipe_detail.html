@@ -54,7 +54,17 @@
 
                 <div class="recipe-header">
                     <div class="recipe-title-section">
-                        <h1 class="recipe-title">{{ recipe.title }}</h1>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h1 class="recipe-title" style="margin: 0;">{{ recipe.title }}</h1>
+                            {% if user.is_authenticated and user == recipe.author %}
+                            <a href="{% url 'edit_recipe' recipe.pk %}" class="btn-primary" style="padding: 10px 20px; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                    <path d="M14.5 2.5C14.8978 2.10217 15.4374 1.87868 16 1.87868C16.2786 1.87868 16.5544 1.93355 16.8118 2.04015C17.0692 2.14674 17.303 2.303 17.5 2.5C17.697 2.697 17.8533 2.93079 17.9599 3.18819C18.0665 3.44558 18.1214 3.72142 18.1214 4C18.1214 4.27858 18.0665 4.55442 17.9599 4.81181C17.8533 5.06921 17.697 5.303 17.5 5.5L6.5 16.5L2 18L3.5 13.5L14.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Edit
+                            </a>
+                            {% endif %}
+                        </div>
 
                         <div class="tag-groups">
                             {% if cuisine_tags %}

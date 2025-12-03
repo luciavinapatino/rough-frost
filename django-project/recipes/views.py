@@ -292,6 +292,93 @@ def recipe_detail(request, pk):
     return render(request, 'recipe_detail.html', context)
 
 
+def edit_recipe(request, pk):
+    """
+    Edit an existing recipe.
+
+    Only the recipe author can edit their own recipes. The form is prepopulated
+    with existing recipe data including tags and steps.
+
+    URL Parameters:
+        pk (int): Primary key of the recipe to edit
+
+    Context:
+        form: RecipeForm instance prepopulated with recipe data
+        recipe: The Recipe object being edited
+
+    Returns:
+        GET: Rendered edit_recipe.html template with prepopulated form
+        POST (valid): Redirect to recipe_detail with success message
+        POST (invalid): Rendered edit_recipe.html with form errors
+        403: If user is not the recipe author
+        404: If recipe not found
+    """
+    from django.http import Http404
+
+    # Get the recipe
+    recipe = (
+        Recipe.objects.select_related('author')
+        .prefetch_related('tags', 'steps')
+        .filter(pk=pk)
+        .first()
+    )
+    if not recipe:
+        raise Http404("Recipe not found")
+
+    # Check authorization
+    if request.user != recipe.author:
+        return HttpResponseForbidden("You don't have permission to edit this recipe")
+
+    if request.method == 'POST':
+        form = RecipeForm(request.POST, instance=recipe)
+        if form.is_valid():
+            # Save the recipe (keeps the same author)
+            recipe = form.save()
+
+            # Clear existing tags and steps
+            recipe.tags.clear()
+            recipe.steps.all().delete()
+
+            # Add cuisine tag
+            cuisine_tag = form.cleaned_data.get('cuisine_type')
+            if cuisine_tag:
+                recipe.tags.add(cuisine_tag)
+
+            # Add additional tags
+            tag_names = form.cleaned_data.get('tags_csv', [])
+            for name in tag_names:
+                tag_obj, _ = Tag.objects.get_or_create(name=name)
+                recipe.tags.add(tag_obj)
+
+            # Recreate steps
+            steps_text = form.cleaned_data.get('steps_text', '')
+            for idx, line in enumerate([s.strip() for s in steps_text.splitlines() if s.strip()], start=1):
+                Step.objects.create(recipe=recipe, step_number=idx, instruction_text=line)
+
+            messages.success(request, 'Recipe updated successfully.')
+            return redirect('recipe_detail', pk=recipe.pk)
+    else:
+        # Prepopulate the form with existing data
+        # Extract cuisine tag
+        cuisine_tag = recipe.tags.filter(category='cuisine').first()
+
+        # Extract other tags (non-cuisine)
+        other_tags = recipe.tags.exclude(category='cuisine')
+        tags_csv = ', '.join([tag.name for tag in other_tags])
+
+        # Extract steps
+        steps_text = '\n'.join([step.instruction_text for step in recipe.steps.all()])
+
+        # Create form with instance and initial data for custom fields
+        form = RecipeForm(instance=recipe, initial={
+            'cuisine_type': cuisine_tag,
+            'tags_csv': tags_csv,
+            'steps_text': steps_text,
+        })
+
+    return render(request, 'edit_recipe.html', {'form': form, 'recipe': recipe})
+
+
 def abtest_view(request):
     """
     Public AB test page at /c50afae showing team member nicknames and
