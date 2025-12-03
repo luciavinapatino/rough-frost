@@ -41,8 +41,8 @@ def _search_recipes_postgres(query, recipes):
         recipes
         .annotate(rank=SearchRank(vector, search_query))
         .filter(rank__gte=0.001)
-        .order_by('-rank')
-        .distinct()
+        .order_by('-rank', 'id')
+        .distinct('id')
     )
 
 

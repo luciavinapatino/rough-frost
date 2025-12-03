@@ -362,3 +362,77 @@ class RecipeDetailTests(TestCase):
         response = self.client.get(url)
         # Edit button should not appear for non-authors
         self.assertNotContains(response, 'href="{}"'.format(reverse('edit_recipe', args=[self.recipe.pk])))
+
+
+class RecipeSearchTests(TestCase):
+    """Test cases for recipe search functionality."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+
+        # Create a recipe with multiple steps containing the same keyword
+        self.recipe = Recipe.objects.create(
+            title='Spaghetti Carbonara',
+            description='Classic Italian pasta dish',
+            author=self.user,
+            ingredients='Pasta\nEggs\nCheese'
+        )
+
+        # Add multiple steps that contain "pasta"
+        Step.objects.create(recipe=self.recipe, step_number=1, instruction_text='Boil the pasta in salted water')
+        Step.objects.create(recipe=self.recipe, step_number=2, instruction_text='Drain the pasta and reserve some water')
+        Step.objects.create(recipe=self.recipe, step_number=3, instruction_text='Mix pasta with the sauce')
+
+    def test_search_returns_no_duplicates(self):
+        """Test that searching returns no duplicate recipes."""
+        # Search for "pasta" which appears in title, ingredients, and 3 steps
+        response = self.client.get(reverse('home'), {'q': 'pasta'})
+
+        self.assertEqual(response.status_code, 200)
+
+        # Get the recipes from the response
+        recipes = list(response.context['recipes'])
+
+        # Should only have 1 recipe (no duplicates)
+        self.assertEqual(len(recipes), 1)
+        self.assertEqual(recipes[0].title, 'Spaghetti Carbonara')
+
+    def test_search_with_multiple_matching_steps_returns_once(self):
+        """Test that a recipe with multiple matching steps appears only once."""
+        # Create another recipe
+        other_recipe = Recipe.objects.create(
+            title='Tomato Soup',
+            description='Simple tomato soup',
+            author=self.user
+        )
+        Step.objects.create(recipe=other_recipe, step_number=1, instruction_text='Chop tomatoes')
+
+        # Search for "pasta" - should only return Spaghetti Carbonara once
+        response = self.client.get(reverse('home'), {'q': 'pasta'})
+        recipes = list(response.context['recipes'])
+
+        # Verify we get exactly one recipe
+        self.assertEqual(len(recipes), 1)
+        self.assertEqual(recipes[0].id, self.recipe.id)
+
+        # Verify that recipe IDs are unique (no duplicates)
+        recipe_ids = [r.id for r in recipes]
+        self.assertEqual(len(recipe_ids), len(set(recipe_ids)))
+
+    def test_search_with_tags_returns_no_duplicates(self):
+        """Test that searching with multiple matching tags returns no duplicates."""
+        # Add multiple tags that might match
+        tag1 = Tag.objects.create(name='Italian', category='cuisine')
+        tag2 = Tag.objects.create(name='quick', category='other')
+        self.recipe.tags.add(tag1, tag2)
+
+        # Search for a term that might appear in multiple contexts
+        response = self.client.get(reverse('home'), {'q': 'Italian'})
+        recipes = list(response.context['recipes'])
+
+        # Should still only return one instance of the recipe
+        recipe_ids = [r.id for r in recipes]
+        self.assertEqual(len(recipe_ids), len(set(recipe_ids)),
+                         "Search results contain duplicate recipes")
