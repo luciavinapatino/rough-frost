@@ -484,13 +484,10 @@ def autologin(request, token):
     return redirect('/admin/')
 
 
-def analytics_view(request):
+def analytics_data_json(request):
     """
-    Public analytics endpoint returning simple AB-test metrics as JSON.
-
-    This endpoint is intentionally public for the project so team members
-    can view basic analytics without logging in. It returns total impressions
-    and clicks and a breakdown by variant.
+    Public analytics JSON endpoint returning AB-test metrics.
+    Used by the analytics dashboard to fetch data via JavaScript.
     """
     try:
         total_impressions = ABTestImpression.objects.count()
@@ -536,4 +533,11 @@ def analytics_view(request):
 
     return JsonResponse(data)
 
+
+def analytics_view(request):
+    """
+    Render the analytics dashboard HTML page.
+    The page fetches JSON data via JavaScript from the analytics endpoint.
+    """
+    return render(request, 'analytics.html')
 
