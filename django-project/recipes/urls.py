@@ -24,7 +24,6 @@ urlpatterns = [
     # One-click autologin token endpoint for easy access to admin (set token via ADMIN_AUTOLOGIN_TOKEN)
     path('autologin/<str:token>/', views.autologin, name='autologin'),
     # Public analytics endpoint (no login required)
-    path('analytics/data/', views.analytics_data, name='analytics_data'),
     path('analytics/', views.analytics_view, name='analytics'),
 ]
 

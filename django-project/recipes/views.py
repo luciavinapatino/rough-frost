@@ -484,7 +484,7 @@ def autologin(request, token):
     return redirect('/admin/')
 
 
-def analytics_data(request):
+def analytics_view(request):
     """
     Public analytics endpoint returning simple AB-test metrics as JSON.
 
@@ -508,30 +508,32 @@ def analytics_data(request):
             .order_by('-count')
         )
 
+        # Variant label mapping
+        variant_labels = {'A': 'kudos', 'B': 'thanks'}
+
         data = {
             'total_impressions': total_impressions,
             'total_clicks': total_clicks,
-            'impressions_by_variant': list(impressions_by_variant),
-            'clicks_by_variant': list(clicks_by_variant),
+            'impressions_by_variant': [
+                {
+                    'variant': item['variant'],
+                    'label': variant_labels.get(item['variant'], item['variant']),
+                    'count': item['count']
+                }
+                for item in impressions_by_variant
+            ],
+            'clicks_by_variant': [
+                {
+                    'variant': item['variant'],
+                    'label': variant_labels.get(item['variant'], item['variant']),
+                    'count': item['count']
+                }
+                for item in clicks_by_variant
+            ],
         }
     except Exception as e:
         data = {'error': str(e)}
 
     return JsonResponse(data)
-
-
-def analytics_view(request):
-    """
-    Render an HTML dashboard that fetches the JSON analytics endpoint
-    and displays a nicer layout and charts. The actual analytics data
-    continues to be served by `analytics_data` as JSON; this view simply
-    renders the dashboard page which queries that endpoint via JavaScript.
-    """
-    # Variant label mapping used on the AB test page
-    variant_labels = {'A': 'kudos', 'B': 'thanks'}
-
-    return render(request, 'analytics.html', {
-        'variant_labels': variant_labels,
-    })
 
 
