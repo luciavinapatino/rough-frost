@@ -50,10 +50,7 @@
         var impressionId = {{ impression_id|default:'null' }};
 
         btn.addEventListener('click', function () {
-          // Optimistically show a small alert
-          alert('You clicked the "' + this.textContent + '" button.');
-
-          // Fire-and-forget POST to record click
+          // Fire-and-forget POST to record click immediately
           try {
             var payload = { variant: variant };
             if (impressionId !== null) payload.impression_id = impressionId;
@@ -74,6 +71,9 @@
           } catch (e) {
             /* ignore */
           }
+
+          // Show alert after recording click
+          alert('You clicked the "' + this.textContent + '" button.');
         });
       })();
     </script>
