@@ -49,23 +49,27 @@ def _search_recipes_postgres(query, recipes):
 def _search_recipes_fallback(query, recipes):
     """
     Perform basic full-text-like search using icontains (SQLite-friendly).
-    
+
     This is slower than PostgreSQL full-text search but works with any database.
     Searches across recipe title, description, tag names, and step instructions.
-    
+
     Args:
         query: Search string from user input
         recipes: QuerySet to filter (typically Recipe.objects.all())
-    
+
     Returns:
         QuerySet of Recipe objects matching the query
     """
-    return recipes.filter(
+    # Get unique recipe IDs first, then filter recipes by those IDs
+    # This prevents duplicates when joining across tags and steps
+    matching_ids = recipes.filter(
         Q(title__icontains=query)
         | Q(description__icontains=query)
         | Q(tags__name__icontains=query)
         | Q(steps__instruction_text__icontains=query)
-    ).distinct()
+    ).values_list('id', flat=True).distinct()
+
+    return Recipe.objects.filter(id__in=matching_ids)
 
 
 def _search_recipes(query, recipes):
