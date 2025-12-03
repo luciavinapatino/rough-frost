@@ -11,6 +11,7 @@ from django.http import HttpResponseForbidden
 from .models import Recipe, Tag, Step, ABTestImpression, ABTestClick
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from .forms import RecipeForm
 
 
@@ -478,6 +479,7 @@ def abtest_view(request):
 
 
 
+@csrf_exempt
 @require_POST
 def abtest_click(request):
     """Handle AJAX POST when a visitor clicks the AB test button.

@@ -60,6 +60,7 @@
 
             fetch('{% url "abtest_click" %}', {
               method: 'POST',
+              credentials: 'same-origin',
               headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
