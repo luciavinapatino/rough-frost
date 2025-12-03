@@ -520,3 +520,18 @@ def analytics_view(request):
     return JsonResponse(data)
 
 
+def analytics_dashboard(request):
+    """
+    Render an HTML dashboard that fetches the JSON analytics endpoint
+    and displays a nicer layout and charts. The actual analytics data
+    continues to be served by `analytics_view` as JSON; this view simply
+    renders the dashboard page which queries that endpoint via JavaScript.
+    """
+    # Variant label mapping used on the AB test page
+    variant_labels = {'A': 'kudos', 'B': 'thanks'}
+
+    return render(request, 'analytics.html', {
+        'variant_labels': variant_labels,
+    })
+
+
