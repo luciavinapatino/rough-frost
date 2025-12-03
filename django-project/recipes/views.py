@@ -361,6 +361,9 @@ def edit_recipe(request, pk):
 
             messages.success(request, 'Recipe updated successfully.')
             return redirect('recipe_detail', pk=recipe.pk)
+        else:
+            # Form validation failed
+            messages.error(request, 'Please correct the errors in the form below.')
     else:
         # Prepopulate the form with existing data
         # Extract cuisine tag
