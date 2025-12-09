@@ -2,8 +2,8 @@
 
 ## What Went Well
 - Image functionality was stabilized across the platform, with broken rendering fixed and fallback logic implemented.
-- The MVP food blog scraper was completed and successfully imported recipes (titles, ingredients, instructions) from multiple blog formats.
-- Image extraction within the scraper was added, enabling automatic capture and validation of recipe images.
+- The Manual food blog input was completed and successfully imported recipes (titles, ingredients, instructions) from multiple blog formats.
+- Image extraction within the recipe input was added, enabling automatic capture and validation of recipe images.
 - The analytics page received its first major iteration, including ingredient frequency insights and a cleaner UI.
 - Overall UI polish improved the product’s usability and reduced visual inconsistencies.
 
